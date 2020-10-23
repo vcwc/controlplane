@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+storedSelector="$(< ./current-console-selection)"
+if [[ "$storedSelector" != "" ]] ; then
+  printf '@%s ' "$storedSelector"
+fi

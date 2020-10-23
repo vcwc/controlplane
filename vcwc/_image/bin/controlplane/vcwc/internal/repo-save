@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+imageName=$1
+if [[ ! -d /vcwc/pwd/images ]] ; then
+  mkdir /vcwc/pwd/images
+fi
+reference=$(echo "${VCWC_REGISTRY}${imageName}.tar" | tr /: _ )
+executionplane docker save --output "/vcwc/pwd/images/${reference}" "${VCWC_REGISTRY}${imageName}"

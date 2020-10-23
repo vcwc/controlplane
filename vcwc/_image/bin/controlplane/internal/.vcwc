@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+(
+  export PATH="$VCWC_EXECUTIONPLANE_APIINTERNALPATH_VCWC"
+	$@
+)

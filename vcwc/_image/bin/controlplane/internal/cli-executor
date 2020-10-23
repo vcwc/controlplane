@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+shopt -s nullglob
+
+if [[ "${@: -1}" == "--help" ]] ; then
+	. _invoke $@;
+#	.invoke  $@ > >( output-parser-tagged ) 2> >( output-parser-tagged );
+#	wait-for-output-parser-tagged
+else
+
+	if [[ "$1" == "console" ]] ; then
+		. _invoke $@;
+#		.invoke $@ > >( output-parser-tagged ) 2> >( output-parser-tagged );
+#		wait-for-output-parser-tagged
+	else
+
+		selector="$(< ./current-console-selection)"
+		if [[ "$selector" == "" ]] ; then
+			selector="${@: -1}"
+		else
+			storedSelection="true"
+		fi
+
+		if [[ "$selector" == "." ]] ; then
+			selector=
+		fi
+
+		if [[ " external package " == *"$VCWC_REPOSITORY_CATEGORY"* ]] ; then
+		  if [[ "$selector" != "backup."* ]] ; then
+	  		selector="${VCWC_REPOSITORY_CATEGORY}.$selector"
+			fi
+		fi
+
+		if [[ $selector != "${VCWC_REALM_RUNTIME}/${VCWC_ECOSYSTEM_RUNTIME}."* && $selector != "${VCWC_REALM_RUNTIME}/${VCWC_ECOSYSTEM_RUNTIME}" ]] ; then
+			if [[ $selector == "${VCWC_ECOSYSTEM_RUNTIME}."* ]] ; then
+				selector="${VCWC_REALM_RUNTIME}/${selector}"
+			else
+				selector="${VCWC_REALM_RUNTIME}/${VCWC_ECOSYSTEM_RUNTIME}.${selector}"
+			fi
+		fi
+
+		if [[ "$selector" == *"$" ]] ; then
+			selector="${selector::-1}"
+		else
+			selector="$selector*"
+		fi
+
+	  for f in $selector ;
+	  do
+	    if [[ "$storedSelection" == "true" ]] ; then
+				. _invoke $1 ${@:2:$#-1} $f;
+#				.invoke $1 ${@:2:$#-1} $f > >( output-parser-tagged ) 2> >( output-parser-tagged );
+#				wait-for-output-parser-tagged
+			else
+				. _invoke $1 ${@:2:$#-2} $f;
+#				.invoke $1 ${@:2:$#-2} $f > >( output-parser-tagged ) 2> >( output-parser-tagged );
+#				wait-for-output-parser-tagged
+			fi
+	  done;
+	fi
+fi
+storedSelector="$(< ./current-console-selection)"
+if [[ "$storedSelector" != "" ]] ; then
+  printf '%s@' "$storedSelector"
+fi
