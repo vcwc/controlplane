@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+echo "
+IMAGE REPO INFO
+---------------
+label               ${VWC_LABEL}
+description         ${VWC_DESCRIPTION}
+realm               ${VWC_REALM_RUNTIME}
+ecosystem           ${VWC_ECOSYSTEM_RUNTIME}
+image-type          ${VWC_IMAGE}
+instance-name       ${VWC_FLAVOR}
+image-tag           ${VWC_TAG}
+base-image          ${VWC_BASE}
+image-build         ${VWC_BUILD}
+"

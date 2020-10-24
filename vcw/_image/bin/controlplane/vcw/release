@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+(
+	export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCWC"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	. invoke-script $imageName environment
+
+	case $1 in
+		--info)
+			. info-summary release
+		;;
+		--save)
+			repo-save $imageName
+		;;
+		--hub)
+  		executionplane docker tag "${VWC_REGISTRY}$imageName" "$imageName:latest"
+			executionplane "--errors-only" docker image push "$imageName:latest"
+			if [[ "${VWC_TAG}" != "" ]] ; then
+				executionplane docker tag "${VWC_REGISTRY}$imageName" "$imageName:${VWC_TAG}"
+				executionplane "--errors-only" docker image push "$imageName:${VWC_TAG}"
+			fi
+		;;
+		*)
+			executionplane "--errors-only" docker image push "$VWC_REGISTRY$imageName:latest"
+			if [[ "${VWC_TAG}" != "" ]] ; then
+				executionplane "--errors-only" docker image push "$VWC_REGISTRY$imageName:${VWC_TAG}"
+			fi
+		;;
+	esac
+  executionplane-complete
+)

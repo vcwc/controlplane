@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+rootPath=$1
+infoFile="/vcw/assets/info-summary"
+infoSummary=$(cat $infoFile | envsubst)
+echo "$infoSummary"

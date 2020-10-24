@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-echo "Starting controlplane.vcwc"
-docker run -it -v /etc:/hostfs/etc:ro -v /var/run/docker.sock:/var/run/docker.sock -v controlplane_repos_internal:/vcwc/pwd registry.vcweb.iot/vcwebio/vcwc.controlplane.vcwc start-cli linux internal $@

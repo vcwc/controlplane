@@ -1,0 +1,25 @@
+---
+version: '3'
+services:
+
+# START SERVICE controlplane.base
+  controlplane:
+    image: ${VWC_REGISTRY}${VWC_REALM_RUNTIME}/vcwc.controlplane.base:v2.0.8
+    environment: [${VWC_DC_CONTROLPLANE_ENVIRONMENT}]
+    command: [${VWC_DC_CONTROLPLANE_COMMAND}]
+    volumes: ['/etc:/hostfs/etc:ro','/var/run/docker.sock:/var/run/docker.sock','controlplane_repos_${VWC_DC_GLOBAL_STACKNAMES}:/vcwc/pwd']
+    ports: []
+    networks: []
+    deploy:
+      mode: ${VWC_DC_CONTROLPLANE_DEPLOY_MODE}
+      resources:
+        limits:
+          memory: '${VWC_DC_CONTROLPLANE_DEPLOY_RESOURCES_LIMITS_MEMORY}'
+        reservations:
+          memory: '${VWC_DC_CONTROLPLANE_DEPLOY_RESOURCES_RESERVATIONS_MEMORY}'
+${VWC_DC_CONTROLPLANE_COMPOSE_EXTENSIONS}
+# END SERVICE controlplane.base
+
+networks: {}
+volumes: {controlplane_repos_${VWC_DC_GLOBAL_STACKNAMES}: { external: true }}
+${VWC_DC_GLOBAL_COMPOSE_EXTENSIONS}

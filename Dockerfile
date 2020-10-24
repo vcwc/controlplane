@@ -1,11 +1,13 @@
-FROM vcwc/bash.wrapper
+ARG  VCW_TAG=1.0.0
+ARG  VCW_TAG_BASH=5.0.18
+FROM vcwc/bash.wrapper:${VCW_TAG_BASH}
 
-COPY ./ /vcwc/repo/
+COPY ./ /vcw/repo/
 
 LABEL co.vcweb.schema-version="1.0" \
       co.vcweb.label="vcwc/controlplane Library" \
       co.vcweb.description="Controlplane image library for core vcwebco implementation." \
       co.vcweb.realm="vcwc" \
       co.vcweb.library="controlplane" \
-      co.vcweb.tag="1.0.0" \
-      co.vcweb.maintainer="vcwc@vcweb.co"
+      co.vcweb.tag="${VCW_TAG}" \
+      co.vcweb.maintainer="vcw@vcweb.co"

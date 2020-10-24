@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-(
-  export PATH="/vcwc/bin/controlplane/internal:$VCWC_EXECUTIONPLANE_ORIGINALPATH"
-  . cli-executor repo "$(basename $0)" $@
-)

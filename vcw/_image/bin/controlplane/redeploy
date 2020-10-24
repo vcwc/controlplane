@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+(
+  export PATH="/vcw/bin/controlplane/internal:$VWC_EXECUTIONPLANE_ORIGINALPATH"
+  . cli-executor deploy down $@
+  . cli-executor deploy $@
+)
