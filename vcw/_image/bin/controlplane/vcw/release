@@ -6,12 +6,6 @@
 	. invoke-script $imageName environment
 
 	case $1 in
-		--info)
-			. info-summary release
-		;;
-		--save)
-			repo-save $imageName
-		;;
 		--hub)
   		executionplane docker tag "${VWC_REGISTRY}$imageName" "$imageName:latest"
 			executionplane "--errors-only" docker image push "$imageName:latest"
