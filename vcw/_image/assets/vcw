@@ -2,4 +2,5 @@
 
 echo "Starting controlplane.vcw"
 docker volume create --driver local --opt type=none --opt o=bind --opt device=$(pwd) vcw_controlplane_repos
-docker run -it -v /etc:/hostfs/etc:ro -v /var/run/docker.sock:/var/run/docker.sock -v vcw_controlplane_repos:/vcw/pwd vcwc/controlplane.vcw start-cli linux $@
+docker run -it -v /etc:/hostfs/etc:ro -v /var/run/docker.sock:/var/run/docker.sock -v vcw_controlplane_repos:/vcw/pwd vcwc/controlplane.vcw --linux $@
+docker volume rm vcw_controlplane_repos

@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-fromTar="$1"
-imageName="$2"
-if [[ "$fromTar" == "true" ]] ; then
-  reference=$(echo "${VWC_REGISTRY}${imageName}.tar" | tr /: _ )
-  executionplane docker load --input "/vcw/pwd/images/$reference"
-else
-  executionplane docker image pull "$VWC_REGISTRY$imageName"
-fi

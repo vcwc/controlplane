@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 (
-  export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCWC"
+  export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
   . executionplane-invoke "$0 $@"
   case $1 in
     --info)
@@ -11,13 +11,16 @@
     ;;
     clone-repo)
       repoName="$2"
-      cd "${VWC_REALM_RUNTIME}"
-      if [[ ! -d $repoName ]] ; then
-        executionplane git clone "$repoName"
+      realm=$(echo ${repoName} | cut -d"/" -f1)
+      if [[ ! -d /vcwc/pwd/${repoName} ]] ; then
+        if [[ ! -d /vcwc/pwd/${realm} ]] ; then mkdir /vcwc/pwd/${realm}; chmod -R 777 /vcwc/pwd/${realm}; fi
+        cd /vcwc/pwd/${realm}
+        executionplane git clone https://github.com/${repoName}.git
+        cd /vcwc/pwd/
+        executionplane chmod -R 777 /vcwc/pwd/${repoName}
       else
         executionplane-warning "Repository folder already exists!"
       fi
-      cd ..
     ;;
     cmd)
       shift
@@ -28,28 +31,22 @@
       controlplane-service $@
     ;;
     extract)
+      repoName="$2"
       if [[ "$3" == "--reload" ]] ; then
-        executionplane docker image pull "$VWC_REGISTRY$2"
+        executionplane docker image pull ${VWC_REGISTRY}${repoName}
+        if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VWC_REGISTRY}${repoName} ${repoName}; fi
       fi
-			. executionplane-capture-output docker create ${VWC_REGISTRY}$2
-			destination="/vcwc/pwd/$2"
-			executionplane mkdir -p $destination
-			executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcwc/repo/. $destination
+			. executionplane-capture-output docker create ${repoName}
+			executionplane mkdir -p /vcwc/pwd/${repoName}
+			executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcw/repo. /vcwc/pwd/${repoName}
 		;;
     load)
-      fromTar="false"
-      if [[ "$2" == "--from-tar" ]] ; then
-        fromTar="true"
-        shift
-      fi
-      repo-load "$fromTar" "$2"
+      repoName="$2"
+      executionplane docker image pull ${VCW_REGISTRY}${repoName}
+      if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VWC_REGISTRY}${repoName} ${repoName}; fi
     ;;
     reset)
-      echo "" > ./current-console-selection
-    ;;
-    save)
-      imageName="${VWC_REALM_RUNTIME}/${VWC_ECOSYSTEM_RUNTIME}.$2"
-      repo-save "$imageName"
+      echo "" > /vcw/pwd/current-console-selection
     ;;
     set)
       echo "$2" > ./current-console-selection
@@ -64,20 +61,16 @@
       if [[ "$port" == "" ]] ; then
         port="5000"
       fi
-      prefix="${VWC_ECOSYSTEM}_registry_base_2"
-      registryImage="$VWC_REGISTRY${VWC_REALM_RUNTIME}/${VWC_ECOSYSTEM}.registry.base:2"
-      executionplane docker run -d -p "${port}:5000" --restart=always --name "${prefix}" -v "${prefix}_data:/var/lib/registry" "${registryImage}"
+      executionplane docker run -d -p ${port}:5000 --restart=always --name vcwc_registry_base_2 -v vcwc_registry_base_2_data:/var/lib/registry ${VWC_REGISTRY}vcwc/registry.base:2
 		;;
     stop-registry)
-      prefix="${VWC_ECOSYSTEM}_registry_base_2"
-      executionplane docker container rm --force "${prefix}"
-      executionplane docker volume rm --force "${prefix}_data"
+      executionplane docker container rm --force vcwc_registry_base_2
+      executionplane docker volume rm --force vcwc_registry_base_2_data
     ;;
     unload)
-			executionplane docker image rm --force "$VWC_REGISTRY$2"
-      if [[ "$3" != "" ]] ; then
-        executionplane docker image rm --force "$VWC_REGISTRY$2:$3"
-			fi
+      repoName="$2"
+      executionplane docker image rm --force ${VCW_REGISTRY}${repoName}
+      if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker image rm --force ${VCW_REGISTRY}${repoName}; fi
     ;;
    *)
       executionplane-error "Method not recognised: $1."

@@ -5,12 +5,13 @@ FROM vcwc/controlplane.base:${VCW_TAG}
 COPY ./_image /vcw/
 RUN chmod -R +x /vcw/bin && chmod -R +x /vcw/assets
 
-ENV VWC_PREENTRYPOINT="/vcw/bin/controlplane/internal/entrypoint"
+ENV VWC_PREENTRYPOINT=/vcw/bin/controlplane/internal/entrypoint \
+    VWC_ENTRYPOINT=start-cli
 
 ENV VWC_REALM=vcwc \
     VWC_LIBRARY=controlplane \
     VWC_IMAGE=controlplane \
-    VWC_FLAVOR=vcwc \
+    VWC_FLAVOR=vcw \
     VWC_TAG=${VCW_TAG} \
     VWC_IMAGENAME=vcwc/controlplane.vcw
 
