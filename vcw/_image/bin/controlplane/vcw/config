@@ -1,33 +1,26 @@
 #!/usr/bin/env bash
-(
-	export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
-	. executionplane-invoke "$0 $@"
-	imageName="${@: -1}"
-	rootPath="/vcw/pwd/${imageName}"
-  . invoke-script $imageName environment
+export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 
-	case $1 in
-		all|build)
-			(
-			export VWC_REGISTRY=
-			cat $rootPath/Dockerfile | envsubst > $rootPath/Dockerfile.static
-			)
-		;;
-		increment)
-			config-increment $2 $rootPath
-		;;
-		remove-crs)
-			config-remove-crs $rootPath
-		;;
-		set-version)
-			config-set-version $2 $rootPath
-		;;
-		--info)
-			. info-summary config
-		;;
-		*)
-			executionplane-error "Method not recognised: $1."
-		;;
-	esac
-  executionplane-complete
-)
+cd /vcw/pwd/${selectedNode}
+imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+imageTag=$(git describe --tags HEAD)
+
+case $1 in
+	increment)
+		config-increment $2 $selectedNode
+	;;
+	remove-crs)
+		config-remove-crs $selectedNode
+	;;
+	set-version)
+		config-set-version $2 $selectedNode
+	;;
+	*)
+		executionplane-error "Method not recognised: $1."
+	;;
+esac
+cd /vcw/pwd
+executionplane-complete

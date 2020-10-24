@@ -1,32 +1,24 @@
 #!/usr/bin/env bash
-(
-	export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
-	. executionplane-invoke "$0 $@"
-	selectedNode="${@: -1}"
-	if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 
-	cd /vcw/pwd/${selectedNode}
-	imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
-	imageTag=$(git describe --tags HEAD)
+cd /vcw/pwd/${selectedNode}
+imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+imageTag=$(git describe --tags HEAD)
 
-	case $1 in
-		--info)
-			. info-summary build
-		;;
-		*)
-			if [[ -f Dockerfile.external ]] ; then extension=".external"; fi
-      if [[ -f Dockerfile${extension} ]] ; then
+if [[ -f Dockerfile.external ]] ; then extension=".external"; fi
+if [[ -f Dockerfile${extension} ]] ; then
 
-				executionplane "--errors-only" docker build -t $imageName -f Dockerfile${extension} .
-				executionplane docker tag ${imageName} ${imageName}:${imageTag}
-				if [[ "${VWC_REGISTRY}" != "" ]] ; then
-					executionplane docker tag ${imageName} ${VWC_REGISTRY}$imageName
-					executionplane docker tag ${imageName} ${VWC_REGISTRY}${imageName}:${imageTag}
-				fi
+	executionplane "--errors-only" docker build -t $imageName -f Dockerfile${extension} .
+	executionplane docker tag ${imageName} ${imageName}:${imageTag}
+	if [[ "${VWC_REGISTRY}" != "" ]] ; then
+		executionplane docker tag ${imageName} ${VWC_REGISTRY}$imageName
+		executionplane docker tag ${imageName} ${VWC_REGISTRY}${imageName}:${imageTag}
+	fi
 
-			else executionplane-error "${selectedNode}/Dockerfile${extension}: File does not exist."; fi
-		;;
-	esac
-	cd /vcw/pwd
-  executionplane-complete
-)
+else executionplane-error "${selectedNode}/Dockerfile${extension}: File does not exist."; fi
+
+cd /vcw/pwd
+executionplane-complete

@@ -1,84 +1,82 @@
 #!/usr/bin/env bash
-(
-	export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
-	. executionplane-invoke "$0 $@"
-	selectedNode="${@: -1}"
-	if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 
-	cd /vcw/pwd/${selectedNode}
-	imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
-	imageTag=$(git describe --tags HEAD)
+cd /vcw/pwd/${selectedNode}
+imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+imageTag=$(git describe --tags HEAD)
 
-	case "$1" in
-		commit)
-			message="${@:2:$#-2}"
-			executionplane git add .
-			executionplane git commit -m "$(echo "$message")"
-			executionplane git tag -f ${imageTag}
-		;;
-		compact)
-			executionplane git reflog expire --updateref --rewrite --stale-fix --expire=all --all
-			executionplane git repack -A -d -f -F --window=4095 --depth=4095 --unpack-unreachable=all
-			executionplane git prune --expire=all
-			executionplane git gc --prune=all --aggressive
-			executionplane git push -f --all
-			executionplane git push -f --tags
-		;;
-		config)
-			executionplane git remote set-url origin "https://github.com/${imageName}.git"
-			executionplane git branch --set-upstream-to=origin/master master
-			executionplane git config core.filemode false
-			executionplane git config credential.helper store
-		;;
-		create)
-			executionplane git init
-			executionplane git remote add origin test
-		;;
-		extract)
-			. executionplane-capture-output docker create ${imageName}
-			executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcwc/repo/. .
-		;;
-		load)
-			executionplane docker image pull ${VCW_REGISTRY}${imageName}:${imageTag}
-			executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${VWC_REGISTRY}${imageName};
-			if [[ "${VCW_REGISTRY}" != "" ]] ; then
-				executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName};
-				executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
-			fi
-		;;
-		log)
-			executionplane git log --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit --date=relative -n 10
-		;;
-		push)
-			executionplane "--errors-only" git push -f origin master
-			executionplane "--errors-only" git push -f origin $imageTag
-		;;
-		remove)
-  		cd /vcw/pwd
-			executionplane rm -rf $selectedNode
-		;;
-		reset)
-			executionplane rm -rf .git
-			repo create $selectedNode
-			repo commit -m "initial checkin after reset, for earlier history extract repository from container image of previous (major) version." $selectedNode
-			repo config $selectedNode
-			repo push $selectedNode
-			repo config $selectedNode
-		;;
-		status)
-			executionplane git status
-		;;
-		tag-registry)
-			executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName
-			executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName:$imageTag
-		;;
-		--info)
-			. info-summary repo
-		;;
-		*)
-			executionplane-error "Method not recognised: $1."
-		;;
-	esac
-	cd /vcw/pwd
-	executionplane-complete
-)
+case "$1" in
+	commit)
+		message="${@:2:$#-2}"
+		executionplane git add .
+		executionplane git commit -m "$(echo "$message")"
+		executionplane git tag -f ${imageTag}
+	;;
+	compact)
+		executionplane git reflog expire --updateref --rewrite --stale-fix --expire=all --all
+		executionplane git repack -A -d -f -F --window=4095 --depth=4095 --unpack-unreachable=all
+		executionplane git prune --expire=all
+		executionplane git gc --prune=all --aggressive
+		executionplane git push -f --all
+		executionplane git push -f --tags
+	;;
+	config)
+		executionplane git remote set-url origin "https://github.com/${imageName}.git"
+		executionplane git branch --set-upstream-to=origin/master master
+		executionplane git config core.filemode false
+		executionplane git config credential.helper store
+	;;
+	create)
+		executionplane git init
+		executionplane git remote add origin test
+	;;
+	extract)
+		. executionplane-capture-output docker create ${imageName}
+		executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcwc/repo/. .
+	;;
+	load)
+		executionplane docker image pull ${VCW_REGISTRY}${imageName}:${imageTag}
+		executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${VWC_REGISTRY}${imageName};
+		if [[ "${VCW_REGISTRY}" != "" ]] ; then
+			executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName};
+			executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
+		fi
+	;;
+	log)
+		executionplane git log --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit --date=relative -n 10
+	;;
+	push)
+		executionplane "--errors-only" git push -f origin master
+		executionplane "--errors-only" git push -f origin $imageTag
+	;;
+	remove)
+		cd /vcw/pwd
+		executionplane rm -rf $selectedNode
+	;;
+	reset)
+		executionplane rm -rf .git
+		repo create $selectedNode
+		repo commit -m "initial checkin after reset, for earlier history extract repository from container image of previous (major) version." $selectedNode
+		repo config $selectedNode
+		repo push $selectedNode
+		repo config $selectedNode
+	;;
+	status)
+		executionplane git status
+	;;
+	tag-registry)
+		executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName
+		executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName:$imageTag
+	;;
+	--info)
+		. info-summary repo
+	;;
+	*)
+		executionplane-error "Method not recognised: $1."
+	;;
+esac
+cd /vcw/pwd
+executionplane-complete
