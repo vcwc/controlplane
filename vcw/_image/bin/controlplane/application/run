@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+(
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_MODECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	. invoke-script $imageName environment
+	method="$1"; shift;
+	if [[ "$1" != "$imageName" ]] ; then stack="$1"; shift; else stack="."; fi
+	case $method in
+		boot|shutdown|start|stop)
+			run-stack $imageName $method $stack ${@:1:$#-1}
+		;;
+		pause)
+			executionplane-error "Method not implemented: $1."
+		;;
+		reboot)
+			run shutdown $stack $@
+			run boot $stack $@
+		;;
+		restart)
+			run stop $stack $@
+			run start $stack $@
+		;;
+		resume)
+			executionplane-error "Method not implemented: $1."
+		;;
+		*)
+			.base run $method $stask $@
+		;;
+	esac
+  executionplane-complete
+)

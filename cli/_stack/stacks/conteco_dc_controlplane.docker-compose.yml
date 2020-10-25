@@ -1,0 +1,25 @@
+---
+version: '3'
+services:
+
+# START SERVICE controlplane.cli
+  controlplane:
+    image: ${CONTECO_REGISTRY}${CONTECO_REALM_RUNTIME}/conteco.controlplane.cli:v2.0.16
+    environment: [${CONTECO_DC_CONTROLPLANE_ENVIRONMENT}]
+    command: [${CONTECO_DC_CONTROLPLANE_COMMAND}]
+    volumes: ['/etc:/hostfs/etc:ro','/var/run/docker.sock:/var/run/docker.sock','controlplane_repos:/conteco/pwd']
+    ports: []
+    networks: []
+    deploy:
+      mode: ${CONTECO_DC_CONTROLPLANE_DEPLOY_MODE}
+      resources:
+        limits:
+          memory: '${CONTECO_DC_CONTROLPLANE_DEPLOY_RESOURCES_LIMITS_MEMORY}'
+        reservations:
+          memory: '${CONTECO_DC_CONTROLPLANE_DEPLOY_RESOURCES_RESERVATIONS_MEMORY}'
+${CONTECO_DC_CONTROLPLANE_COMPOSE_EXTENSIONS}
+# END SERVICE controlplane.cli
+
+networks: {}
+volumes: {controlplane_repos: { external: true }}
+${CONTECO_DC_GLOBAL_COMPOSE_EXTENSIONS}

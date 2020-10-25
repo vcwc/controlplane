@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+shopt -s nullglob
+imageName=$1
+component=$2
+
+folder="soleco"
+if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
+componentPath="/conteco/pwd/${imageName}/${folder}"
+
+# set-config can only be used after config-volume
+. invoke-script $imageName "${folder}/_configuration/_configuration"
+
+if [[ ! -d ${componentPath}/_component ]] ; then
+	mkdir ${componentPath}/_component
+fi
+
+# copy module to component
+cp -r ${componentPath}/_module/* ${componentPath}/_component
+
+# put a copy of stacks, volumes and volumes-initialised in _configuration if none present
+if [[ ! -f ${componentPath}/_configuration/stacks ]] ; then cp ${componentPath}/_module/stacks ${componentPath}/_configuration/stacks; fi
+if [[ ! -f ${componentPath}/_configuration/volumes ]] ; then cp ${componentPath}/_module/volumes ${componentPath}/_configuration/volumes; fi
+if [[ ! -f ${componentPath}/_configuration/volumes-initialised ]] ; then cp ${componentPath}/_module/volumes-initialised ${componentPath}/_configuration/volumes-initialised; fi
+
+# copy _configs folder to _configuration if not present
+if [[ -d ${componentPath}/_module/_configs ]] ; then
+	if [[ ! -d ${componentPath}/_configuration/_configs ]] ; then mkdir ${componentPath}/_configuration/_configs; fi
+	for f in ${componentPath}/_module/_configs/*
+	do
+		folderName="$(basename $f)"
+		if [[ ! -d ${componentPath}/_configuration/_configs/$folderName ]] ; then cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs; fi
+	done;
+fi
+
+# copy _volumes folder to _configuration if not present
+if [[ -d ${componentPath}/_module/_volumes ]] ; then
+	if [[ ! -d ${componentPath}/_configuration/_volumes ]] ; then mkdir ${componentPath}/_configuration/_volumes; fi
+	for f in ${componentPath}/_module/_volumes/*
+	do
+		if [[ -f $f ]] ; then
+			fileName="$(basename $f)"
+			if [[ ! -f ${componentPath}/_configuration/_volumes/$ileName ]] ; then
+				cp ${componentPath}/_module/_volumes/$fileName ${componentPath}/_configuration/_volumes/$fileName
+			fi
+		else
+			folderName="$(basename $f)"
+			if [[ ! -d ${componentPath}/_configuration/_volumes/$folderName ]] ; then cp -r ${componentPath}/_module/_volumes/$folderName ${componentPath}/_configuration/_volumes; fi
+		fi
+	done;
+fi
+
+chmod -R 777 $componentPath

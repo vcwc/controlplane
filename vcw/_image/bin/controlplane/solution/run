@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+(
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_SOLECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	. invoke-script $imageName environment
+
+	method="$1"; shift;
+	if [[ "$1" != "-"* && "$1" != "$imageName" ]] ; then component="$1"; shift; fi
+	if [[ "$1" != "-"* && "$1" != "$imageName" ]] ; then stack="$1"; shift; fi
+	if [[ "$1" == "--recurse" ]] ; then recurse="true"; shift; else recurse="false"; fi
+
+	# if no component and first iteration, then execute repo script
+	if [[ "$component" = "" && " reboot restart " != *" $method"* && "$SOLECO_CUSTOM_IMPLEMENTATION_TRIGGERED" != "true" ]] ; then
+		export SOLECO_CUSTOM_IMPLEMENTATION_TRIGGERED="true"
+  	. invoke-script $imageName "soleco/_controlplane/$method" $@
+  else
+		if [[ "$component" == "" ]] ; then component="."; fi
+		if [[ "$stack" == "" ]] ; then stack="."; fi
+		case $method in
+			boot|shutdown|start|stop)
+				run-stack $imageName $method $component $stack ${@:1:$#-1}
+				if [[ "$recurse" == "true" ]] ; then run-descendant $imageName $component $stack $recurse $method; fi
+			;;
+			pause)
+				executionplane-error "Method not implemented: $1."
+			;;
+			reboot)
+				run shutdown $component $stack $@
+				run boot $component $stack $@
+			;;
+			restart)
+				run stop $component $stack $@
+				run start $component $stack $@
+			;;
+			resume)
+				executionplane-error "Method not implemented: $1."
+			;;
+			*)
+				.base run $@
+			;;
+		esac
+	fi
+  executionplane-complete
+)

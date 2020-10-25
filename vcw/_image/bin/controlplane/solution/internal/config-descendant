@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+imageName="$1"
+component="$2"
+action="$3"
+
+if [[ "$component" == "." ]] ; then
+  parent="soleco";
+else
+  parent="soleco/$component";
+  prefix="$component/"
+fi
+
+for folder in $imageName/$parent/*
+do
+  if [[ -d $folder ]] ;  then
+    folderName="$(basename $folder)"
+    if [[ "$folderName" != "_"* ]] ; then config $action $prefix$folderName $imageName; fi
+  fi
+done

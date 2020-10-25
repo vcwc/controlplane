@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+(
+	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_SOLECO"
+	. executionplane-invoke "$0 $@"
+	imageName="${@: -1}"
+	. invoke-script $imageName environment
+
+	if [[ " up down downup local-up local-down local-downup --info " != *"$1"* ]] ; then method="up"; else method="$1"; shift; fi
+	if [[ "$1" != "$imageName" && "$1" != "." && "$1" != "-"* ]] ; then component="$1"; shift; fi
+
+	# if no component and first iteration, then execute repo script
+	if [[ "$component" == "" && " up down downup " == *"$method"* && "$SOLECO_CUSTOM_IMPLEMENTATION_TRIGGERED" != "true" ]] ; then
+		export SOLECO_CUSTOM_IMPLEMENTATION_TRIGGERED="true"
+  	if [[ "$method" == "down"* ]] ; then . invoke-script $imageName "soleco/_controlplane/remove" $@; else . invoke-script $imageName "soleco/_controlplane/deploy" $@; fi
+  else
+		case $method in
+			--info)
+				executionplane-error "No implementation for modeco deploy --info: $@"
+			;;
+			down|downup|up)
+				if [[ "$method" == *"down"* ]] ; then
+        	controlplane-service deploy "local-down" $component $imageName
+					if [[ "$component" == "" ]] ; then deploy-networks down $imageName .; fi
+				fi
+				if [[ "$method" == *"up"* ]] ; then
+					if [[ "$component" == "" ]] ; then deploy-networks up $imageName .; fi
+					controlplane-service deploy "local-up" $component $imageName
+				fi
+			;;
+			local-down|local-downup|local-up)
+				if [[ "$method" == *"down"* ]] ; then
+				  if [[ "$component" == "" ]] ; then . invoke-script $imageName soleco/_controlplane/remove-volumes "$imageName"; else
+					. invoke-script $imageName soleco/$component/_component/deploy-local-down "$imageName"; fi
+				fi
+				if [[ "$method" == *"up"* ]] ; then
+					if [[ "$component" == "" ]] ; then . invoke-script $imageName soleco/_controlplane/deploy-volumes "$imageName";	else
+					. invoke-script $imageName soleco/$component/_component/deploy-local-up "$imageName"; fi
+				fi
+			;;
+			*)
+				executionplane-error "invalid API method: $method"
+			;;
+		esac
+	fi
+	executionplane-complete
+)

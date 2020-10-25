@@ -6,7 +6,7 @@ if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNod
 
 cd /vcw/pwd/${selectedNode}
 imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
-imageTag=$(git describe --tags HEAD)
+imageTag=$(git describe --tags HEAD 2>/dev/null)
 
 case "$1" in
 	commit)

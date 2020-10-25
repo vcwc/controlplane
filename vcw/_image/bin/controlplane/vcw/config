@@ -8,15 +8,21 @@ cd /vcw/pwd/${selectedNode}
 imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
 imageTag=$(git describe --tags HEAD)
 
+# VERSION MANAGEMENT MUST MOVE TO THE REPO METHOD
 case $1 in
-	increment)
-		config-increment $2 $selectedNode
-	;;
-	remove-crs)
-		config-remove-crs $selectedNode
-	;;
-	set-version)
-		config-set-version $2 $selectedNode
+#	increment)
+#		config-increment $2 $selectedNode
+#	;;
+#	remove-crs)
+#		config-remove-crs $selectedNode
+#	;;
+#	set-version)
+#		config-set-version $2 $selectedNode
+#	;;
+# VERSION MANAGEMENT MUST MOVE TO THE REPO METHOD
+
+	stack)
+		.stack config $@
 	;;
 	*)
 		executionplane-error "Method not recognised: $1."

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+method="$1"
+imageName="$2"
+component="$3"
+shift; shift; shift;
+
+# local and global network prefix
+. set-config $imageName $component
+
+if [[ "$component" == "" ]] ; then
+  if [[ "$method" == "up" ]] ; then executionplane --silent docker network create -d overlay ${CONTECO_NETWORKGLOBAL}_overlay; fi
+  parent="soleco";
+  prefix=""
+else
+  parent="soleco/$component";
+  prefix="$component/"
+fi
+
+# create local overlay networks
+if [[ "$method" == "down" ]] ; then
+  if [[ "$SOLECO_HIDE_COMPONENT" != "true" ]] ; then executionplane --silent docker network rm ${CONTECO_NETWORKLOCAL}_overlay; fi
+else
+  if [[ "$SOLECO_HIDE_COMPONENT" != "true" ]] ; then executionplane --silent docker network create -d overlay ${CONTECO_NETWORKLOCAL}_overlay; fi
+fi
+
+for folder in $imageName/$parent/*
+do
+  if [[ -d $folder ]] ;  then
+    folderName="$(basename $folder)"
+    if [[ "$folderName" != "_"* ]] ; then deploy-networks $method $imageName "$prefix$folderName"; fi
+  fi
+done

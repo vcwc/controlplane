@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+workDir="$1"
+if [[ "$workDir" == "/"* ]] ; then shift; else workDir=""; fi
+if [[ "$workDir" == "" ]] ; then workDir="$(pwd)"; fi
+
+# make it workspace calls with rm commands
+if [[ "$1" == "--reset" ]] ; then
+  cluster/start console cmd rm -rf *
+  deployment/start console cmd rm -rf *
+  external/start console cmd rm -rf *
+  infometis/start console cmd rm -rf *
+  interface/start console cmd rm -rf *
+  internal/start console cmd rm -rf *
+  package/start console cmd rm -rf *
+  module/start console cmd rm -rf *
+  solution/start console cmd rm -rf *
+  shift
+fi
+
+echo "Refreshing setup: $@"
+realm="$1"
+registry="$2"
+if [[ "$realm" == "" ]] ; then realm="${CONTECO_REALM}"; fi;
+if [[ "$registry" == "" ]] ; then registry="${CONTECO_REGISTRY}"; fi;
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.base
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.cli
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.conteco
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.depleco
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.infometis
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.inteco
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.modeco
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.soleco
+${CONTECO_SUDO}docker pull ${registry}${realm}/conteco.controlplane.swareco
+${CONTECO_SUDO}docker run -v /var/run/docker.sock:/var/run/docker.sock -v ${workDir}:/conteco/pwd ${registry}${realm}/conteco.controlplane.cli --base ${CONTECO_SUDO}

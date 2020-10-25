@@ -2,16 +2,18 @@
 (
   export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
   . executionplane-invoke "$0 $@"
-  imageName="${@: -1}"
-  . invoke-script $imageName environment
+  selectedNode="${@: -1}"
+  if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+  cd /vcw/pwd/${selectedNode}
+  imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+  imageTag=$(git describe --tags HEAD)
 
   case $1 in
-		--info)
-			. info-summary run
-		;;
 		*)
 			executionplane-error "Method not recognised: $1."
 		;;
 	esac
+  cd /vcw/pwd
   executionplane-complete
 )

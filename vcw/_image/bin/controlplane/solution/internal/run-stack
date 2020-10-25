@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+imageName="$1"
+action="$2"
+component="$3"
+stackSelector="$4"
+shift; shift; shift; shift;
+folder="soleco"
+if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
+
+# local and global network prefix
+. set-config $imageName $component
+
+if [[ "$stackSelector" == "." ]] ; then stackSelector=""; fi
+if [[ "$stackSelector" != "" && "$stackSelector" != "_"* ]] ; then stackSelector=",$stackSelector"; fi
+
+tmpfilef=$(mktemp /tmp/extract-resource.XXXXXX)
+
+extract-resource $imageName "${folder}/_component/stacks" $tmpfilef
+cat $tmpfilef | grep "$action" | grep "$stackSelector" | while read -r line ; do
+		IFS=',' read -r -a columns <<< "$line"
+		(
+		stacktype=${columns[0]}
+		package=${columns[1]}
+		instance=${columns[2]}
+		stack=${columns[3]}
+		export CONTECO_STACKPREFIX="${MODECO_MODULEPREFIX}_$instance"
+		stackName="${MODECO_MODULEPREFIX}_${stack}"
+		if (( ${#stackName} > 50 )) ; then
+			let "excess = ${#stackName} - 45 - ${#MODECO_MODULEPREFIX}";
+			stackName="${MODECO_MODULEPREFIX}_X_${stackName:excess:${#stackName}}";
+			export CONTECO_STACKPREFIX="${MODECO_MODULEPREFIX}_X_${instance:excess:${#instance}}";
+		fi;
+		if [[ " boot start " == *" $action"* ]] ; then
+			export CONTECO_URLPREFIX="${MODECO_URLPREFIX}/${instance}"
+			tmpfilep=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+			tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+			stackFolder="${folder}/_component/$instance"
+			composeFile="$stackFolder/$stack.docker-compose.yml"
+			. invoke-script $imageName "$stackFolder/settings.package"
+			. invoke-script $imageName "$stackFolder/settings"
+			if [[ "$action" == "start" ]] ; then
+				interactive="${stack^^}_COMMAND_INTERACTIVE"
+				command="${stack^^}_COMMAND"
+				if [[ "${!interactive}" == "true" ]]; then export ${stack^^}_COMMAND="'.invoke $* '"; fi
+			fi
+			extract-resource $imageName $composeFile $tmpfilep
+			cat $tmpfilep | envsubst > $tmpfile
+			cat $tmpfile
+			executionplane  docker stack deploy -c $tmpfile "$stackName"
+			rm $tmpfilep
+			rm $tmpfile
+		elif [[ " shutdown stop " == *" $action"* ]] ; then
+			executionplane docker stack rm "$stackName"
+		fi
+		)
+done
+rm $tmpfilef

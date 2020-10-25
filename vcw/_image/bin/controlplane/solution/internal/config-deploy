@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+imageName=$1
+component=$2
+
+folder="soleco"
+if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
+componentPath="/conteco/pwd/${imageName}/${folder}"
+basePath="$componentPath/_component"
+
+# generate _component/configuration
+cp "${componentPath}/_module/_configuration" "${componentPath}/_component/_configuration"
+cat "${componentPath}/_configuration/_configuration" >> ${componentPath}/_component/_configuration
+
+# use _configuration stack definition if it exists
+if [[ -f ${componentPath}/_configuration/stacks ]] ; then cp ${componentPath}/_configuration/stacks ${componentPath}/_component/stacks; fi
+if [[ -f ${componentPath}/_configuration/volumes ]] ; then cp ${componentPath}/_configuration/volumes ${componentPath}/_component/volumes; fi
+if [[ -f ${componentPath}/_configuration/volumes-initialised ]] ; then cp ${componentPath}/_configuration/volumes-initialised ${componentPath}/_component/volumes-initialised; fi
+
+if [[ -d ${componentPath}/_configuration/_volumes ]] ; then cp -r ${componentPath}/_configuration/_volumes/* ${componentPath}/_component/_volumes; fi
+
+. set-config $imageName $component
+
+DOLLAR='$'
+echo $'#!/usr/bin/env bash\n\n' > $basePath/deploy-local-down
+echo $'#!/usr/bin/env bash\n\n' > $basePath/deploy-local-up
+
+echo "
+executionplane --silent docker container prune --force
+" >> $basePath/deploy-local-down
+
+IFS=$'\n' read -d '' -r -a volumes < $basePath/volumes
+for volume in ${volumes[@]};
+do
+	#	executionplane --silent docker volume rm --force ${volume}
+	echo "continue=\"true\"
+while [[ \"true\" == \"${DOLLAR}continue\" ]] ;
+do
+	executionplane docker volume rm \"${MODECO_MODULEPREFIX}_${volume}\"
+	result=${DOLLAR}(docker volume ls | grep \"${MODECO_MODULEPREFIX}_${volume}\")
+	if [[ \"${DOLLAR}result\" == \"\" ]] ; then
+		continue=\"false\"
+	else
+		sleep 3;
+	fi
+done;
+	" >> $basePath/deploy-local-down
+echo "	executionplane --silent docker volume create ${MODECO_MODULEPREFIX}_${volume}
+	" >> $basePath/deploy-local-up
+done;
+
+IFS=$'\n' read -d '' -r -a volumes < $basePath/volumes-initialised
+for volumeSettings in ${volumes[@]};
+do
+	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
+	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
+	if [[ -d "$basePath/_volumes/${volumeName}" ]] ; then
+		echo "executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /${folder}/_component/_volumes/${volumeName}/* ${volumeDir}
+		" >> $basePath/deploy-local-up
+	else
+		echo "executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /${folder}/_component/_volumes/${volumeName}.tar
+		" >> $basePath/deploy-local-up
+	fi
+done;
+
+chmod -R 777 $componentPath

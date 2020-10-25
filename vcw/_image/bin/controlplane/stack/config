@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_STACK"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+cd /vcw/pwd/${selectedNode}
+imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+imageTag=$(git describe --tags HEAD)
+
+executionplane-info "IMPLEMENTING CONFIG STACK"
+
+#deployPath="$rootPath/conteco/docker-compose"
+#if [[ -f $deployPath/environment ]] ; then
+#	. $deployPath/environment
+#fi
+#if [[ "$CONTECO_TYPE" != "external" ]] ; then
+#	executionplane rm $deployPath/stacks/*.yml
+#	if [[ "$CONTECO_TYPE" == "stack" ]] ; then
+#		config-deploy-generate-templates-stack $deployPath
+#	elif [[ "$CONTECO_TYPE" == "module" ]] ; then
+#		config-deploy-gather-stacks-module $deployPath
+#	fi
+#	if [[ " stack module " ==  *"$CONTECO_TYPE"* ]] ; then
+#		config-deploy-generate-environment-stack $deployPath
+#	fi
+#	config-deploy-generate-docker-compose-yml $deployPath
+#	config-deploy-generate-environment-module $deployPath
+#fi
+executionplane-complete

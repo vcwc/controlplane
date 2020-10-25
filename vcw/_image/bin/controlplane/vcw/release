@@ -14,8 +14,8 @@ case $1 in
 		executionplane "--errors-only" docker image push ${imageName}:${imageTag}
 	;;
 	*)
-		executionplane "--errors-only" docker image push ${imageName}
-		executionplane "--errors-only" docker image push ${imageName}:${imageTag}
+		executionplane "--errors-only" docker image push ${VWC_REGISTRY}${imageName}
+		executionplane "--errors-only" docker image push ${VWC_REGISTRY}${imageName}:${imageTag}
 	;;
 esac
 cd /vcw/pwd;
