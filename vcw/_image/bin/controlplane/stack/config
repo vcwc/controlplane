@@ -11,7 +11,7 @@ if [[ ! -f _stack/settings ]] ; then executionplane-error "Stack settings file d
 (
 	. _stack/settings;
 	stackType="single"
-  if [[ "$VCW_STACK_DC_GLOBAL_STACK_STACKS" != "" ]]; then stackType="grouping";
+  if [[ "$VCW_STACK_GLOBAL_STACK_STACKS" != "" ]]; then stackType="grouping";
 	elif [[ "$VCW_STACK_GLOBAL_STACKS" == *","* ]]; then stackType="multiple"; fi
 
 	export VCW_SERVICE_ID="$selectedNode"
@@ -24,15 +24,15 @@ if [[ ! -f _stack/settings ]] ; then executionplane-error "Stack settings file d
 			config-all-generate-settings-stack
 		;;
 		grouping)
-#		  config-grouping-generate-stack-templates
-#			config-grouping-multiple-generate-environment
-#			config-grouping-generate-docker-compose $selectedNode $imageTag
-#			config-all-generate-settings-stack
+		  config-grouping-generate-stack-templates
+			config-grouping-multiple-generate-environment
+			config-grouping-generate-docker-compose
+			config-all-generate-settings-stack
 		;;
 		multiple)
 #			config-multiple-gather-stacks
 #			config-grouping-multiple-generate-environment
-#			config-multiple-generate-docker-compose $selectedNode $imageTag
+#			config-multiple-generate-docker-compose
 #			config-all-generate-settings-stack
 		;;
 		*)

@@ -1,46 +1,41 @@
 #!/usr/bin/env bash
-deployPath=$1
-
 DOLLAR='$'
 
 # generate environment file
 environment_file=$'#!/usr/bin/env bash\n\n'
-environmentEntry=$(sed -n "/# START CONFIGURATION/,/# END CONFIGURATION/p" $deployPath/environment)
+environmentEntry=$(sed -n "/# START CONFIGURATION/,/# END CONFIGURATION/p" _stack/settings)
 environment_file="${environment_file}${environmentEntry}
 
 "
-environmentEntry=$(sed -n "/# START GLOBAL SETTINGS/,/# END GLOBAL SETTINGS/p" $deployPath/environment)
+environmentEntry=$(sed -n "/# START GLOBAL SETTINGS/,/# END GLOBAL SETTINGS/p" _stack/settings)
 environment_file="${environment_file}${environmentEntry}
 "
 
-tmpfile=$(mktemp /tmp/environmentfile.XXXXXX)
-cat $deployPath/environment.template > $tmpfile
-
-sed -i '/#!\/usr\/bin\/env bash/d' $tmpfile
-IFS=',' read -r -a keys <<< "${CONTECO_DC_GLOBAL}"
+sed -i '/#!\/usr\/bin\/env bash/d' _stack/settings.tmp
+IFS=',' read -r -a keys <<< "${VCW_STACK_GLOBAL}"
 for key in ${keys[@]};
 do
-	sed -i "/${key:1}/d" $tmpfile
+	sed -i "/${key:1}/d" _stack/settings.tmp
 	done;
-environment_file="${environment_file}$(cat $tmpfile)
+environment_file="${environment_file}$(cat _stack/settings.tmp)
 
 "
 
-intermediate=$(grep _VOLUMES_ $tmpfile | grep -v _GLOBAL | cut -d'"' -f 2 | tr '\n' '|')
+intermediate=$(grep _VOLUMES_ _stack/settings.tmp | grep -v _GLOBAL | cut -d'"' -f 2 | tr '\n' '|')
 intermediate="${intermediate//|/: \{ \}, }"
 intermediate=$(echo $intermediate | sed 's/.$//')
 
 environment_file="${environment_file}# START TOPLEVEL SETTINGS
 "
-if [[ "$CONTECO_DC_GLOBAL" != *"CONTECO_DC_GLOBAL_VOLUMES"* ]] ; then
-	environment_file="${environment_file}export CONTECO_DC_GLOBAL_VOLUMES=
+if [[ "$VCW_STACK_GLOBAL" != *"VCW_STACK_GLOBAL_VOLUMES"* ]] ; then
+	environment_file="${environment_file}export VCW_STACK_GLOBAL_VOLUMES=
 "
 fi
-if [[ "$CONTECO_DC_GLOBAL" != *"CONTECO_DC_GLOBAL_NETWORKS"* ]] ; then
-	environment_file="${environment_file}export CONTECO_DC_GLOBAL_NETWORKS=\"${DOLLAR}{CONTECO_TYPE}_overlay: { external: true }\"
+if [[ "$VCW_STACK_GLOBAL" != *"VCW_STACK_GLOBAL_NETWORKS"* ]] ; then
+	environment_file="${environment_file}export VCW_STACK_GLOBAL_NETWORKS=\"${DOLLAR}{CONTECO_TYPE}_overlay: { external: true }\"
 "
 fi
 environment_file="${environment_file}# END TOPLEVEL SETTINGS
 "
-rm $tmpfile
-echo "$environment_file" > $deployPath/environment
+rm _stack/settings.tmp
+echo "$environment_file" > _stack/settings
