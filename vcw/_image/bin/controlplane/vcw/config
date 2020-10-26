@@ -8,8 +8,9 @@ cd /vcw/pwd/${selectedNode}
 imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
 imageTag=$(git describe --tags HEAD)
 
-# VERSION MANAGEMENT MUST MOVE TO THE REPO METHOD
 case $1 in
+
+# VERSION MANAGEMENT MUST MOVE TO THE REPO METHOD
 #	increment)
 #		config-increment $2 $selectedNode
 #	;;

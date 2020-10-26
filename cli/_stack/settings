@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# START CONFIGURATION
+DOLLAR='$'
+export VCW_STACK_GLOBAL_STACKS="vcwc/controlplane/cli"
+export VCW_STACK_GLOBAL_STACKNAMES="vcw_stack_controlplane"
+export VCW_STACK_GLOBAL_BOOTSTACKS="vcw_stack_controlplane"
+export VCW_STACK_GLOBAL_RUNSTACKS="vcw_stack_controlplane"
+export VCW_STACK_GLOBAL_VOLUME_LIST=""
+export VCW_STACK_GLOBAL_VOLUME_INITIALISED=""
+# END CONFIGURATION
+
+# START GLOBAL SETTINGS
+export VCW_STACK_GLOBAL='\
+$VCW_STACK_GLOBAL_SERVICE_NAME,\
+$VCW_STACK_GLOBAL_IMAGE_NAME,\
+$VCW_STACK_CONTROLPLANE_NETWORKS,\
+$VCW_STACK_CONTROLPLANE_PORTS,\
+$VCW_STACK_CONTROLPLANE_VOLUMES,\
+$VCW_STACK_GLOBAL_NETWORKS,\
+$VCW_STACK_GLOBAL_VOLUMES'
+export VCW_STACK_GLOBAL_SERVICE_NAME="controlplane"
+export VCW_STACK_GLOBAL_IMAGE_NAME="vcwc/controlplane/cli"
+export VCW_STACK_CONTROLPLANE_PORTS=
+export VCW_STACK_CONTROLPLANE_NETWORKS=
+export VCW_STACK_CONTROLPLANE_VOLUMES="'/etc:/hostfs/etc:ro','/var/run/docker.sock:/var/run/docker.sock','controlplane_repos:/conteco/pwd'"
+export VCW_STACK_GLOBAL_NETWORKS=
+export VCW_STACK_GLOBAL_VOLUMES="controlplane_repos: { external: true }"
+# END GLOBAL SETTINGS
+
+# START SETTINGS controlplane.conteco
+export VCW_STACK_CONTROLPLANE_COMMAND="'--keepalive:0','.invoke console start-registry'"
+export VCW_STACK_BASH_COMMAND_INTERACTIVE="true" # enable command entry - from modeco onward
+export VCW_STACK_CONTROLPLANE_ENVIRONMENT=
+export VCW_STACK_CONTROLPLANE_DEPLOY_MODE="replicated"
+export VCW_STACK_CONTROLPLANE_DEPLOY_RESOURCES_LIMITS_MEMORY="128m"
+export VCW_STACK_CONTROLPLANE_DEPLOY_RESOURCES_RESERVATIONS_MEMORY="5m"
+# END SETTINGS controlplane.conteco
+
+# START TOPLEVEL SETTINGS
+# END TOPLEVEL SETTINGS
+
+# docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/conteco/pwd ${registry}${realm}/conteco.controlplane.cli
