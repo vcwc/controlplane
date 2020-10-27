@@ -22,7 +22,12 @@ case $1 in
 #	;;
 # VERSION MANAGEMENT MUST MOVE TO THE REPO METHOD
 
+	module)
+		shift;
+		.module config $@
+	;;
 	stack)
+		shift;
 		.stack config $@
 	;;
 	*)

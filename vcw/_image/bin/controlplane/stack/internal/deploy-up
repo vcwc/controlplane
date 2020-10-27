@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-stackName=$1
-composefile=$2
-imageName=$3
-executionplane docker network create -d overlay  "${CONTECO_NETWORKLOCAL}_overlay"
-executionplane docker network create -d overlay  "${CONTECO_NETWORKGLOBAL}_overlay"
-if [[ "$CONTECO_DC_GLOBAL_VOLUME_LIST" != "" ]] ; then
-	IFS=',' read -r -a volumes <<< "${CONTECO_DC_GLOBAL_VOLUME_LIST}"
+
+executionplane docker network create -d overlay  "${VCW_STACK_NETWORKLOCAL}_overlay"
+executionplane docker network create -d overlay  "${VCW_STACK_NETWORKGLOBAL}_overlay"
+
+if [[ "$VCW_STACK_GLOBAL_VOLUME_LIST" != "" ]] ; then
+	IFS=',' read -r -a volumes <<< "${VCW_STACK_GLOBAL_VOLUME_LIST}"
 	for volume in ${volumes[@]};
 	do
 		executionplane docker volume create $(echo "$volume" | envsubst)
 	done;
 fi
 
-IFS=',' read -r -a volumes <<< "${CONTECO_DC_GLOBAL_VOLUME_INITIALISED}"
+IFS=',' read -r -a volumes <<< "${VCW_STACK_GLOBAL_VOLUME_INITIALISED}"
 for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
-	executionplane --silent docker run -v ${volumeName}:${volumeDir} ${CONTECO_REGISTRY}$imageName cp -r /conteco/docker-compose/volumes/${volumeName:11}/* ${volumeDir}
+	executionplane --silent docker run -v ${volumeName}:${volumeDir} ${VCW_REGISTRY}$imageName cp -r _stack/volumes/${volumeName:10}/* ${volumeDir}
 done;
 
-tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
-arguments="-c $tmpfile $stackName"
-(
-
-	cat $composefile | envsubst > $tmpfile
+IFS=',' read -r -a stackNames <<< "${VCW_STACK_GLOBAL_STACKNAMES}"
+for stackName in ${stackNames[@]};
+do
+	tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+	arguments="-c $tmpfile $stackName"
+	cat _stack/stacks/${stackName}.docker-compose.yml | envsubst > $tmpfile
 	cat $tmpfile
-)
-executionplane docker stack deploy $arguments
-rm $tmpfile
+	executionplane docker stack deploy $arguments
+	rm $tmpfile
+done;

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-(
-  export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_APPLICATION"
-	$@
-)

@@ -12,7 +12,7 @@ environment_file="${environment_file}${environmentEntry}
 "
 
 sed -i '/#!\/usr\/bin\/env bash/d' _stack/settings.tmp
-IFS=',' read -r -a keys <<< "${VCW_STACK_GLOBAL}"
+IFS=',' read -r -a keys <<< "$(echo ${VCW_STACK_GLOBAL} | tr '\\' ' ' | tr '\n' ' ')"
 for key in ${keys[@]};
 do
 	sed -i "/${key:1}/d" _stack/settings.tmp

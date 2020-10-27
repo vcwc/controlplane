@@ -24,8 +24,8 @@ if [[ $environment_other != "" ]] ; then
 	environment_other="
 $environment_other"
 fi
-environment_module="${environment_module}# START OTHER VARIABLES$environment_other
-# END OTHER VARIABLES
+environment_module="${environment_module}# START MODULE SETTINGS$environment_other
+# END MODULE SETTINGS
 
 "
 
@@ -36,14 +36,14 @@ intermediate=$(echo $intermediate | sed 's/.$//')
 if [[ $environment_volumes != "" ]] ; then
 	environment_volumes="
 $environment_volumes"
-	environment_module="${environment_module}# START VOLUMES VARIABLES$environment_volumes
+	environment_module="${environment_module}# START VOLUMES SETTINGS$environment_volumes
 export VCW_STACK_GLOBAL_VOLUMES=\"$intermediate\"
-# END VOLUMES VARIABLES
+# END VOLUMES SETTINGS
 
 "
 else
-	environment_module="${environment_module}# START VOLUMES VARIABLES
-# END VOLUMES VARIABLES
+	environment_module="${environment_module}# START VOLUMES SETTINGS
+# END VOLUMES SETTINGS
 
 "
 fi
@@ -53,22 +53,22 @@ if [[ $environment_ports != "" ]] ; then
 	environment_ports="
 $environment_ports"
 fi
-environment_module="${environment_module}# START PORTS VARIABLES$environment_ports
-# END PORTS VARIABLES
+environment_module="${environment_module}# START PORTS SETTINGS$environment_ports
+# END PORTS SETTINGS
 
 "
 environment_networks=$(grep _NETWORKS $tmpfile | grep -v _GLOBAL)
 if [[ $environment_networks != "" ]] ; then
 	environment_networks="
 $environment_networks"
-	environment_module="${environment_module}# START NETWORKS VARIABLES$environment_networks
+	environment_module="${environment_module}# START NETWORKS SETTINGS$environment_networks
 export VCW_STACK_GLOBAL_NETWORKS=\"${CONTECO_ECOSYSTEM_RUNTIME}_overlay: { external: true }\"
-# END NETWORKS VARIABLES
+# END NETWORKS SETTINGS
 
 "
 else
-	environment_module="${environment_module}# START NETWORKS VARIABLES
-# END NETWORKS VARIABLES
+	environment_module="${environment_module}# START NETWORKS SETTINGS
+# END NETWORKS SETTINGS
 
 "
 fi
@@ -77,8 +77,8 @@ if [[ $environment_deploy != "" ]] ; then
 	environment_deploy="
 $environment_deploy"
 fi
-environment_module="${environment_module}# START DEPLOY VARIABLES$environment_deploy
-# END DEPLOY VARIABLES
+environment_module="${environment_module}# START DEPLOY SETTINGS$environment_deploy
+# END DEPLOY SETTINGS
 
 "
 echo "$environment_module" > _stack/settings.stack
