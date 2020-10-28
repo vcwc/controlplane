@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 (
   export PATH="/vcw/bin/controlplane/internal:$VWC_EXECUTIONPLANE_ORIGINALPATH"
-  . cli-executor deploy down $@
-  . cli-executor deploy $@
+  if [[ " stack module solution " == *"$1"* ]]; then api="$1"; shift; fi
+  . cli-executor deploy $api down $@
+  . cli-executor deploy $api $@
 )

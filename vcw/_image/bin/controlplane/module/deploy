@@ -11,7 +11,6 @@ imageTag=$(git describe --tags HEAD)
 if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
 	. set-config $selectedNode
-
 	if [[ " up down downup local-up local-down local-downup " != *"$1"* ]] ; then method="up";
 	else method="$1"; shift; fi
 

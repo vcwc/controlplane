@@ -16,5 +16,5 @@ else
 fi
 storedSelector="$(< ./current-console-selection)"
 if [[ "$storedSelector" != "" ]] ; then
-  printf '%s@' "$storedSelector"
+  printf '\n%s@' "$storedSelector"
 fi

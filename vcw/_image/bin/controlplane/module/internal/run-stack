@@ -3,7 +3,6 @@ imageName="$1"; shift;
 action="$1"; shift;
 stackName="$1"; shift;
 
-echo "run-stack: $imageName $action $stackName $@"
 if [[ "$stackName" == "." ]] ; then stackName=""; fi
 if [[ "$stackName" == "_"* ]] ; then stackSelector="$stackName"; else stackSelector=",$stackName"; fi
 
@@ -14,17 +13,19 @@ package=${columns[1]}
 stack=${columns[2]}
 if [[ " boot start " == *" $action"* ]] ; then
 (
-	export CONTECO_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
-	export CONTECO_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/$package"
+	export VCW_STACK_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
+	export VCW_STACK_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/$package"
 	. _module/packages/$package/settings.package
 	. _module/packages/$package/settings
+
 	if [[ "$action" == "start" ]] ; then
 		interactive="${stack^^}_COMMAND_INTERACTIVE"
 		command="${stack^^}_COMMAND"
 		if [[ "${!interactive}" == "true" ]]; then export ${stack^^}_COMMAND="'.invoke $* '"; fi
 	fi
+
 	tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
-	cat _module/packages/$package/$stack.docker-compose.yml | envsubst > $tmpfile
+	cat _module/packages/$package/stacks/$stack.docker-compose.yml | envsubst > $tmpfile
 	cat $tmpfile
 	executionplane  docker stack deploy -c $tmpfile "${VCW_STACK_MODULEPREFIX}__$stack"
 	rm $tmpfile

@@ -14,9 +14,8 @@ do
 	if [[ "$subNode" != "" ]] ; then subNode="${subNode}/"; fi
 
 	if [[ ! -d _module/import/${package} ]] ; then mkdir _module/import/${package}; fi
-	if [[ ! -d _module/packages/${package} ]] ; then mkdir _module/packages/${package}; fi
+	if [[ ! -d _module/packages/${package} ]] ; then mkdir _module/packages/${package}; chmod -R 777 _module/packages/${package}; fi
 
-	executionplane-info "${VCW_REGISTRY}$imageName"
 	. executionplane-capture-output docker create "${VCW_REGISTRY}$imageName"
   executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${subNode}_stack/. /vcw/pwd/${selectedNode}/_module/import/${package}/
 	chmod -R 777 _module/import/${package}
@@ -42,21 +41,21 @@ do
 		done;
 
 		# configs and volumes folders
-		oldStack="${oldPackage:10}"
-		let "prefix = ${#oldStack}"
-		if [[ ! -d _module/configs ]] ; then mkdir _module/configs; fi
-		if [[ ! -d _module/configs/_packages ]] ; then mkdir _module/configs/_packages; fi
+		oldStack="${oldPackage:9}"
+		let "prefix = ${#oldPackage}"
 		for f in _module/import/$package/configs/*
 		do
+			if [[ ! -d _module/configs ]] ; then mkdir _module/configs; fi
+			if [[ ! -d _module/configs/_packages ]] ; then mkdir _module/configs/_packages; fi
 			itemName=$(basename $f)
 			newItemName="$package${itemName:$prefix}"
 			if [[ _module/configs/_packages/$newItemName ]] ; then rm -rf _module/configs/_packages/$newItemName; fi
 			mv  _module/import/$package/configs/$itemName _module/configs/_packages/$newItemName
 	  done
-		if [[ ! -d _module/volumes ]] ; then mkdir _module/volumes; fi
-		if [[ ! -d _module/volumes/_packages ]] ; then mkdir _module/volumes/_packages; fi
 		for f in _module/import/$package/volumes/*
 		do
+			if [[ ! -d _module/volumes ]] ; then mkdir _module/volumes; fi
+			if [[ ! -d _module/volumes/_packages ]] ; then mkdir _module/volumes/_packages; fi
 			itemName=$(basename $f)
 			newItemName="$package${itemName:$prefix}"
 			if [[ _module/volumes/_packages/$newItemName ]] ; then rm -rf _module/volumes/_packages/$newItemName; fi
@@ -64,4 +63,5 @@ do
 	  done
 	)
 done;
+chmod -R 777 _module/*
 rm -rf _module/import

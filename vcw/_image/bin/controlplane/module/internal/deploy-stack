@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 method="$1"
-selectedNode ="$2"
+selectedNode="$2"
 stack="$3"
 
 # create module overlay network - global
 if [[ "$method" == *"down"* ]] ; then
-  executionplane --silent docker network rm ${CONTECO_NETWORKLOCAL}_overlay
+  executionplane --silent docker network rm ${VCW_STACK_NETWORKLOCAL}_overlay
 fi
 if [[ "$method" == *"up"* ]] ; then
-  executionplane --silent docker network create -d overlay ${CONTECO_NETWORKGLOBAL}_overlay
-  executionplane --silent docker network create -d overlay ${CONTECO_NETWORKLOCAL}_overlay
+  executionplane --silent docker network create -d overlay ${VCW_STACK_NETWORKGLOBAL}_overlay
+  executionplane --silent docker network create -d overlay ${VCW_STACK_NETWORKLOCAL}_overlay
 fi
 
 # create module package volumes - on all nodes
-controlplane-service deploy "local-$method" "$stack" "$selectedNode"
+.vcw deploy module "local-$method" "$stack" "$selectedNode"
