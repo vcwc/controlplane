@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+ selectedNode="$1"
 
 DOLLAR='$'
 echo $'#!/usr/bin/env bash\n' > _module/deploy-local-down
+echo "prefix=\"${VCW_STACK_MODULEPREFIX}__${DOLLAR}1\"" >> _module/deploy-local-down
 echo "prefix=\"${VCW_STACK_MODULEPREFIX}__${DOLLAR}1\"" >> _module/deploy-local-down
 cp _module/deploy-local-down _module/deploy-local-up
 
@@ -38,15 +40,15 @@ for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
-	if [[ -d $rootPath/modeco/volumes/${volumeName} ]] ; then
+	if [[ -d _module/volumes/${volumeName} ]] ; then
 		echo "
 if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /modeco/volumes/${volumeName}/* ${volumeDir}
+	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_STACK_REGISTRY}vcwc/controlplane.vcw cp -r /vcw/pwd/${selectedNode}/_module/volumes/${volumeName}/* ${volumeDir}
 fi" >> _module/deploy-local-up
 	else
 		echo "
 if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /modeco/volumes/${volumeName}.tar
+	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_STACK_REGISTRY}vcwc/controlplane.vcw tar -C / -xvf /vcw/pwd/${selectedNode}/_module/volumes/${volumeName}.tar
 fi" >> _module/deploy-local-up
 	fi
 done;

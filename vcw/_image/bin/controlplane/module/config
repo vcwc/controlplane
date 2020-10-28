@@ -14,7 +14,7 @@ if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configur
 		all)
 			config-package $selectedNode
 			config-module
-			config-deploy
+			config-deploy $selectedNode
 			config-config
 		;;
 		exec)
@@ -28,7 +28,7 @@ if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configur
 			config-module
 		;;
 		deploy)
-			config-deploy
+			config-deploy $selectedNode
 		;;
 		config)
 			config-config
