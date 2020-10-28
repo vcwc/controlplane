@@ -16,6 +16,10 @@ for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
+	for f in $(find _stack/configs/$volumeName ); do
+		if [[ -f $f ]] ; then cat $f | envsubst > ${f//configs/volumes};
+	elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
+	done
 	executionplane --silent docker run -v ${volumeName}:${volumeDir} ${VCW_REGISTRY}$imageName cp -r _stack/volumes/${volumeName:10}/* ${volumeDir}
 done;
 

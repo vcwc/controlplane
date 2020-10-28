@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
+export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+cd /vcw/pwd/${selectedNode}
+imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+imageTag=$(git describe --tags HEAD)
+
+if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
-	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_MODECO"
-	. executionplane-invoke "$0 $@"
-	imageName="${@: -1}"
-	. invoke-script $imageName environment
+	. set-config $selectedNode
 	method="$1"; shift;
-	if [[ "$1" != "$imageName" ]] ; then stack="$1"; shift; else stack="."; fi
+  if [[ $# -gt 1 ]] ; then stack=$1; shift; else stack="."; fi
+
 	case $method in
 		boot|shutdown|start|stop)
-			run-stack $imageName $method $stack ${@:1:$#-1}
+			run-stack $imageName $method $stack
 		;;
 		pause)
 			executionplane-error "Method not implemented: $1."
@@ -25,8 +33,9 @@
 			executionplane-error "Method not implemented: $1."
 		;;
 		*)
-			.base run $method $stask $@
+			executionplane-error "invalid API method: $method"
 		;;
 	esac
-  executionplane-complete
 )
+cd /vcw/pwd
+executionplane-complete

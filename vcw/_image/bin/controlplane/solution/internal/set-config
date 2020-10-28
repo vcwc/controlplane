@@ -24,12 +24,12 @@ if [[ "$component" != "" ]] ; then
     urlSuffix="/$component";
   fi
 fi
-export MODECO_HOSTNAME="${SOLECO_HOSTNAME}"
+export VCW_STACK_HOSTNAME="${SOLECO_HOSTNAME}"
 export CONTECO_NETWORKGLOBAL="${CONTECO_NAME_CONTROLPLANE}"
 export CONTECO_NETWORKLOCAL="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
-export MODECO_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
-export MODECO_URLPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
-export MODECO_STACKSCOPE="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
+export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
+export VCW_STACK_MODULE_URLPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
+export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
 
 # solution level config overrides component
 . invoke-script $imageName soleco/configuration

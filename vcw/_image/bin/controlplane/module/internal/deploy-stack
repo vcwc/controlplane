@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 method="$1"
-imageName="$2"
+selectedNode ="$2"
 stack="$3"
-
-# local and global network prefix
-. set-config $imageName
 
 # create module overlay network - global
 if [[ "$method" == *"down"* ]] ; then
@@ -16,4 +13,4 @@ if [[ "$method" == *"up"* ]] ; then
 fi
 
 # create module package volumes - on all nodes
-controlplane-service deploy "local-$method" "$stack" "$imageName"
+controlplane-service deploy "local-$method" "$stack" "$selectedNode"

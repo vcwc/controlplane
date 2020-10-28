@@ -3,6 +3,7 @@ shopt -s nullglob
 selectedNode="$1"
 
 if [[ ! -d _module/import ]] ; then mkdir _module/import; fi
+chmod -R 777 _module/import
 IFS=',' read -r -a modulePackages <<< "${VCW_MODULE_PACKAGES}"
 for packageConfig in ${modulePackages[@]};
 do
@@ -26,7 +27,7 @@ do
 		# settings files
 		sed -i -e "s/${oldPackage^^}_/${package^^}_/g" _module/import/${package}/settings.stack
 		sed -i -e "s/${oldPackage}/${package}/g" _module/import/${package}/settings.stack
-		cp _module/import/${package}/settings.stack _module/packages/${package}/settings.stack
+		cp _module/import/${package}/settings.stack _module/packages/${package}/settings.package
 		if [[ ! -f _module/packages/${package}/settings ]] ; then cp _module/import/${package}/settings.stack _module/packages/${package}/settings; fi
 
     # docker-compose files
@@ -44,22 +45,22 @@ do
 		oldStack="${oldPackage:10}"
 		let "prefix = ${#oldStack}"
 		if [[ ! -d _module/configs ]] ; then mkdir _module/configs; fi
-		if [[ ! -d _module/configs/packages ]] ; then mkdir _module/configs/packages; fi
+		if [[ ! -d _module/configs/_packages ]] ; then mkdir _module/configs/_packages; fi
 		for f in _module/import/$package/configs/*
 		do
 			itemName=$(basename $f)
 			newItemName="$package${itemName:$prefix}"
-			if [[ _module/configs/packages/$newItemName ]] ; then rm -rf _module/configs/packages/$newItemName; fi
-			mv  _module/import/$package/configs/$itemName _module/configs/packages/$newItemName
+			if [[ _module/configs/_packages/$newItemName ]] ; then rm -rf _module/configs/_packages/$newItemName; fi
+			mv  _module/import/$package/configs/$itemName _module/configs/_packages/$newItemName
 	  done
 		if [[ ! -d _module/volumes ]] ; then mkdir _module/volumes; fi
-		if [[ ! -d _module/volumes/packages ]] ; then mkdir _module/volumes/packages; fi
+		if [[ ! -d _module/volumes/_packages ]] ; then mkdir _module/volumes/_packages; fi
 		for f in _module/import/$package/volumes/*
 		do
 			itemName=$(basename $f)
 			newItemName="$package${itemName:$prefix}"
-			if [[ _module/volumes/packages/$newItemName ]] ; then rm -rf _module/volumes/packages/$newItemName; fi
-			mv  _module/import/$package/volumes/$itemName _module/volumes/packages/$newItemName
+			if [[ _module/volumes/_packages/$newItemName ]] ; then rm -rf _module/volumes/_packages/$newItemName; fi
+			mv  _module/import/$package/volumes/$itemName _module/volumes/_packages/$newItemName
 	  done
 	)
 done;

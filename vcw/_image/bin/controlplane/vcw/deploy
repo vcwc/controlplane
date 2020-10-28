@@ -14,6 +14,10 @@
       shift;
   		.stack deploy $@
   	;;
+    module)
+      shift;
+  		.module deploy $@
+  	;;
     *)
       executionplane-error "Method not recognised: $1."
     ;;

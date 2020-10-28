@@ -9,32 +9,35 @@ imageTag=$(git describe --tags HEAD)
 
 if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
-  . _module/configuration
-	command=$1
-	shift
-	case $command in
-#		exec)
-#			config-exec $imageName $rootPath $@
-#		;;
-		package)
-			config-package $selectedNode  $imageName
+	. set-config $selectedNode
+	case $1 in
+		all)
+			config-package $selectedNode
+			config-module
+			config-deploy
+			config-config
 		;;
-#		module)
-#			config-module $imageName $rootPath
-#		;;
-#		deploy)
-#			config-deploy $imageName $rootPath
-#		;;
-#		config)
-#			config-config $imageName $rootPath
-#		;;
-#		volume)
-#			stack=""
-#			if [[ $# -gt 1 ]] ; then
-#				stack=$1
-#			fi
-#			config-volume $imageName $rootPath $stack
-#		;;
+		exec)
+			shift;
+			config-exec $@
+		;;
+		package)
+			config-package $selectedNode
+		;;
+		module)
+			config-module
+		;;
+		deploy)
+			config-deploy
+		;;
+		config)
+			config-config
+		;;
+		volume)
+			stack=""
+			if [[ $# -gt 2 ]] ; then stack=$2; fi
+			config-volume $selectedNode $stack
+		;;
 		*)
 			executionplane-error "Method not recognised: $1."
 		;;

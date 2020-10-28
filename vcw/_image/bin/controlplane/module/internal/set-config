@@ -1,30 +1,10 @@
 #!/usr/bin/env bash
-imageName="$1"
+module=$(echo "$1" | tr '/' '_')
 
-# modules have module level configuration
 DOLLAR='$'
-
-if [[ "$CONTECO_TYPE" == "package" ]] ; then
-	export CONTECO_NETWORKGLOBAL="${CONTECO_ECOSYSTEM_RUNTIME}"
-	export CONTECO_NETWORKLOCAL="package"
-	export MODECO_MODULEPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}"
-	export MODECO_URLPREFIX="${CONTECO_TYPE}"
-else
-	export CONTECO_NETWORKGLOBAL="${CONTECO_NAME_CONTROLPLANE}"
- if [[ "${CONTECO_TYPE}" == "package" ]] ; then
-    export CONTECO_NETWORKLOCAL="module_${CONTECO_TYPE}"
-	 	export MODECO_MODULEPREFIX="module_${CONTECO_TYPE}_${CONTECO_NAME}"
-	 	export MODECO_URLPREFIX="${CONTECO_TYPE}"
-	else
-		export CONTECO_NETWORKLOCAL="module_${CONTECO_TYPE}_${CONTECO_NAME}"
-		export MODECO_MODULEPREFIX="module_${CONTECO_TYPE}_${CONTECO_NAME}"
-		export MODECO_URLPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}"
-	fi
-fi
-export MODECO_HOSTNAME="${DOLLAR}{CONTECO_HOSTNAME}"
-if [[ "${CONTECO_ECOSYSTEM_RUNTIME}" != "${CONTECO_NAME_CONTROLPLANE}" ]] ; then
-	prefix="${CONTECO_ECOSYSTEM_RUNTIME:${#CONTECO_NAME_CONTROLPLANE}+1}_"
-fi
-export MODECO_STACKSCOPE="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
-
-. invoke-script $imageName modeco/configuration
+export VCW_STACK_NETWORKGLOBAL="vcw_global"
+export VCW_STACK_NETWORKLOCAL="${module}"
+export VCW_STACK_MODULEPREFIX="${module}"
+export VCW_STACK_MODULE_URLPREFIX="${selectedNode}"
+export VCW_STACK_HOSTNAME="${DOLLAR}{VCW_HOSTNAME}"
+. _module/configuration

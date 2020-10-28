@@ -35,8 +35,8 @@ do
 	echo "continue=\"true\"
 while [[ \"true\" == \"${DOLLAR}continue\" ]] ;
 do
-	executionplane docker volume rm \"${MODECO_MODULEPREFIX}_${volume}\"
-	result=${DOLLAR}(docker volume ls | grep \"${MODECO_MODULEPREFIX}_${volume}\")
+	executionplane docker volume rm \"${VCW_STACK_MODULEPREFIX}__${volume}\"
+	result=${DOLLAR}(docker volume ls | grep \"${VCW_STACK_MODULEPREFIX}__${volume}\")
 	if [[ \"${DOLLAR}result\" == \"\" ]] ; then
 		continue=\"false\"
 	else
@@ -44,7 +44,7 @@ do
 	fi
 done;
 	" >> $basePath/deploy-local-down
-echo "	executionplane --silent docker volume create ${MODECO_MODULEPREFIX}_${volume}
+echo "	executionplane --silent docker volume create ${VCW_STACK_MODULEPREFIX}__${volume}
 	" >> $basePath/deploy-local-up
 done;
 
@@ -54,10 +54,10 @@ do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
 	if [[ -d "$basePath/_volumes/${volumeName}" ]] ; then
-		echo "executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /${folder}/_component/_volumes/${volumeName}/* ${volumeDir}
+		echo "executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /${folder}/_component/_volumes/${volumeName}/* ${volumeDir}
 		" >> $basePath/deploy-local-up
 	else
-		echo "executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /${folder}/_component/_volumes/${volumeName}.tar
+		echo "executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /${folder}/_component/_volumes/${volumeName}.tar
 		" >> $basePath/deploy-local-up
 	fi
 done;

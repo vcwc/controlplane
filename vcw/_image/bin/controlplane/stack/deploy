@@ -14,7 +14,7 @@ if [[ ! -f _stack/settings.stack ]] ; then executionplane-error "Stack settings 
 (
 	export VCW_STACK_URLPREFIX="vcw_stack"
 	export VCW_STACK_NETWORKLOCAL="vcw_stack"
-	export VCW_STACK_NETWORKGLOBAL="vcw_stack_global"
+	export VCW_STACK_NETWORKGLOBAL="vcw_global"
   if [[ "$VCW_STACK_GLOBAL_STACKNAMES" == *","* ]] ; then export VCW_STACK_STACKPREFIX=$(echo ${VCW_STACK_GLOBAL_STACKNAMES} | cut -d',' -f1); else export VCW_STACK_STACKPREFIX="vcw_stack"; fi
 	. _stack/settings.stack;
 	deploy-${command}

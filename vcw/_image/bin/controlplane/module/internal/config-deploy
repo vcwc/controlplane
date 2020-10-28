@@ -1,60 +1,54 @@
 #!/usr/bin/env bash
-imageName="$1"
-rootPath="$2"
-basePath="$rootPath/modeco"
 
-# local and global network prefix
-. set-config $imageName
-
-echo $'#!/usr/bin/env bash\n\n' > $basePath/deploy-local-down
-echo "prefix=\"${MODECO_MODULEPREFIX}_${DOLLAR}2\"
-" >> $basePath/deploy-local-down
-cp $basePath/deploy-local-down $basePath/deploy-local-up
+DOLLAR='$'
+echo $'#!/usr/bin/env bash\n' > _module/deploy-local-down
+echo "prefix=\"${VCW_STACK_MODULEPREFIX}__${DOLLAR}1\"" >> _module/deploy-local-down
+cp _module/deploy-local-down _module/deploy-local-up
 
 echo "
-executionplane --silent docker container prune --force
-" >> $basePath/deploy-local-down
+executionplane --silent docker container prune --force" >> _module/deploy-local-down
 
-IFS=$'\n' read -d '' -r -a volumes < $basePath/module-volumes
+IFS=$'\n' read -d '' -r -a volumes < _module/module-volumes
 for volume in ${volumes[@]};
 do
 	#	executionplane --silent docker volume rm --force ${volume}
-	echo "if [[ \"${MODECO_MODULEPREFIX}_${volume}\" == \"${DOLLAR}prefix\"* ]] ; then
-		continue=\"true\"
-		while [[ \"true\" == \"${DOLLAR}continue\" ]] ;
-		do
-			executionplane docker volume rm \"${MODECO_MODULEPREFIX}_${volume}\"
-			result=${DOLLAR}(docker volume ls | grep \"${MODECO_MODULEPREFIX}_${volume}\")
-			if [[ \"${DOLLAR}result\" == \"\" ]] ; then
-				continue=\"false\"
-			else
-				sleep 3;
-			fi
-		done;
-	fi
-	" >> $basePath/deploy-local-down
-	echo "if [[ \"${MODECO_MODULEPREFIX}_${volume}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker volume create ${MODECO_MODULEPREFIX}_${volume}
-	fi
-	" >> $basePath/deploy-local-up
+	echo "
+if [[ \"${VCW_STACK_MODULEPREFIX}__${volume}\" == \"${DOLLAR}prefix\"* ]] ; then
+	continue=\"true\"
+	while [[ \"true\" == \"${DOLLAR}continue\" ]] ;
+	do
+		executionplane docker volume rm \"${VCW_STACK_MODULEPREFIX}__${volume}\"
+		result=${DOLLAR}(docker volume ls | grep \"${VCW_STACK_MODULEPREFIX}__${volume}\")
+		if [[ \"${DOLLAR}result\" == \"\" ]] ; then
+			continue=\"false\"
+		else
+			sleep 3;
+		fi
+	done;
+fi" >> _module/deploy-local-down
+
+	echo "
+if [[ \"${VCW_STACK_MODULEPREFIX}__${volume}\" == \"${DOLLAR}prefix\"* ]] ; then
+	executionplane --silent docker volume create ${VCW_STACK_MODULEPREFIX}__${volume}
+fi" >> _module/deploy-local-up
 done;
 
-IFS=$'\n' read -d '' -r -a volumes < $basePath/module-volumes-initialised
+IFS=$'\n' read -d '' -r -a volumes < _module/module-volumes-initialised
 for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
 	if [[ -d $rootPath/modeco/volumes/${volumeName} ]] ; then
-		echo "if [[ \"${MODECO_MODULEPREFIX}_${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-			executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /modeco/volumes/${volumeName}/* ${volumeDir}
-		fi
-		" >> $basePath/deploy-local-up
+		echo "
+if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
+	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 cp -r /modeco/volumes/${volumeName}/* ${volumeDir}
+fi" >> _module/deploy-local-up
 	else
-		echo "if [[ \"${MODECO_MODULEPREFIX}_${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-			executionplane --silent docker run -v ${MODECO_MODULEPREFIX}_${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /modeco/volumes/${volumeName}.tar
-		fi
-		" >> $basePath/deploy-local-up
+		echo "
+if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
+	executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{CONTECO_REGISTRY}${DOLLAR}1 tar -C / -xvf /modeco/volumes/${volumeName}.tar
+fi" >> _module/deploy-local-up
 	fi
 done;
 
-chmod -R 777 $basePath
+chmod -R 777 _module/deploy-local*
