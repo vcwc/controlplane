@@ -14,10 +14,13 @@ if [[ "$hostname" == "host.docker.internal" ]] ; then
 fi
 export PS1="${hostname}:${VWC_FLAVOR}#$ "
 
-echo "" > /vcw/pwd/current-console-selection
+export VCW_CURRENT_CONSOLE_SELECTION="/vcw/pwd/console-selection-${VWC_EXECUTIONTAG}"
+echo "" > "${VCW_CURRENT_CONSOLE_SELECTION}"
 
 if [[ "$@" == *"@"* ]] ; then
 	echo "$@" | tr "@" "\n" > commands.sh
 	bash commands.sh
 	rm commands.sh
 else bash $@; fi
+
+rm "${VCW_CURRENT_CONSOLE_SELECTION}"

@@ -39,10 +39,10 @@ case $1 in
     if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VWC_REGISTRY}${repoName} ${repoName}; fi
   ;;
   reset)
-    echo "" > /vcw/pwd/current-console-selection
+    echo "" > ${VCW_CURRENT_CONSOLE_SELECTION}
   ;;
   set)
-    echo "$2" > ./current-console-selection
+    echo "$2" > "${VCW_CURRENT_CONSOLE_SELECTION}"
   ;;
   set-repo-user)
 		executionplane git config --global user.name "$2"

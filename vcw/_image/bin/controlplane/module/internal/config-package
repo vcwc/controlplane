@@ -2,8 +2,11 @@
 shopt -s nullglob
 selectedNode="$1"
 
-if [[ ! -d _module/import ]] ; then mkdir _module/import; fi
-chmod -R 777 _module/import
+# Remove unregistered packages
+if [[ ! -d _module/packages ]] ; then mkdir _module/packages; chmod -R 777 _module/packages; fi
+for f in _module/packages/* ; do if [[ "${VCW_MODULE_PACKAGES}" != *"$(basename $f):"* ]] ; then rm -rf $f; fi; done
+
+if [[ ! -d _module/import ]] ; then mkdir _module/import; chmod -R 777 _module/import; fi
 IFS=',' read -r -a modulePackages <<< "${VCW_MODULE_PACKAGES}"
 for packageConfig in ${modulePackages[@]};
 do
@@ -30,14 +33,13 @@ do
 		if [[ ! -f _module/packages/${package}/settings ]] ; then cp _module/import/${package}/settings.stack _module/packages/${package}/settings; fi
 
     # docker-compose files
-		if [[ ! -d _module/packages/${package}/stacks ]] ; then mkdir _module/packages/${package}/stacks; fi
 		IFS=',' read -r -a stackNames <<< "${VCW_STACK_GLOBAL_STACKNAMES}"
 		for stackName in ${stackNames[@]};
 		do
 			newStackName=$(echo "$stackName" | sed "s/${oldPackage}/${package}/g")
 			sed -i -e "s/${stackName^^}_/${newStackName^^}_/g" _module/import/${package}/stacks/${stackName}.docker-compose.yml
 			sed -i -e "s/${stackName}_/${newStackName}_/g" _module/import/${package}/stacks/${stackName}.docker-compose.yml
-			cp _module/import/${package}/stacks/${stackName}.docker-compose.yml _module/packages/${package}/stacks/${newStackName}.docker-compose.yml
+			cp _module/import/${package}/stacks/${stackName}.docker-compose.yml _module/packages/${package}/_${newStackName}.docker-compose.yml
 		done;
 
 		# configs and volumes folders
@@ -51,6 +53,7 @@ do
 			newItemName="$package${itemName:$prefix}"
 			if [[ _module/configs/_packages/$newItemName ]] ; then rm -rf _module/configs/_packages/$newItemName; fi
 			mv  _module/import/$package/configs/$itemName _module/configs/_packages/$newItemName
+			if [[ ! -d _module/configs/$newItemName ]] ; then cp -r _module/configs/_packages/$newItemName _module/configs/$newItemName; fi
 	  done
 		for f in _module/import/$package/volumes/*
 		do
@@ -60,6 +63,7 @@ do
 			newItemName="$package${itemName:$prefix}"
 			if [[ _module/volumes/_packages/$newItemName ]] ; then rm -rf _module/volumes/_packages/$newItemName; fi
 			mv  _module/import/$package/volumes/$itemName _module/volumes/_packages/$newItemName
+			if [[ ! -d _module/volumes/$newItemName ]] ; then cp -r _module/volumes/_packages/$newItemName _module/volumes/$newItemName; fi
 	  done
 	)
 done;
