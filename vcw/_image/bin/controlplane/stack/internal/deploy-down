@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+selectedNode="$1"
 
 IFS=',' read -r -a stackNames <<< "${VCW_STACK_GLOBAL_STACKNAMES}"
 for stackName in ${stackNames[@]};

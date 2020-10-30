@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # $1 platform
 
-export VWC_OS="container";
+export VCW_OS="container";
 if [[ "$1" == "--"* ]] ; then
-	if [[ "$1" == "--windows" ]] ; then export VWC_OS="windows";
-	elif [[ "$1" == "--linux" ]] ; then export VWC_OS="linux"; fi
+	if [[ "$1" == "--windows" ]] ; then export VCW_OS="windows";
+	elif [[ "$1" == "--linux" ]] ; then export VCW_OS="linux"; fi
 	shift
 fi
 
-hostname="${VWC_HOSTNAME}"
+hostname="${VCW_HOSTNAME}"
 if [[ "$hostname" == "host.docker.internal" ]] ; then
 	hostname="linuxkit"
 fi
-export PS1="${hostname}:${VWC_FLAVOR}#$ "
+export PS1="${hostname}:${VCW_FLAVOR}#$ "
 
-export VCW_CURRENT_CONSOLE_SELECTION="/vcw/pwd/console-selection-${VWC_EXECUTIONTAG}"
+export VCW_CURRENT_CONSOLE_SELECTION="/vcw/pwd/console-selection-${VCW_EXECUTIONTAG}"
 echo "" > "${VCW_CURRENT_CONSOLE_SELECTION}"
 
 if [[ "$@" == *"@"* ]] ; then

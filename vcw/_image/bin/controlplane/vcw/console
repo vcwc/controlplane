@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_VCW"
 . executionplane-invoke "$0 $@"
 case $1 in
   clone-repo)
@@ -26,17 +26,17 @@ case $1 in
   extract)
     repoName="$2"
     if [[ "$3" == "--reload" ]] ; then
-      executionplane docker image pull ${VWC_REGISTRY}${repoName}
-      if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VWC_REGISTRY}${repoName} ${repoName}; fi
+      executionplane docker image pull ${VCW_REGISTRY}${repoName}
+      if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VCW_REGISTRY}${repoName} ${repoName}; fi
     fi
 		. executionplane-capture-output docker create ${repoName}
 		executionplane mkdir -p /vcwc/pwd/${repoName}
-		executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcw/repo. /vcwc/pwd/${repoName}
+		executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo. /vcwc/pwd/${repoName}
 	;;
   load)
     repoName="$2"
     executionplane docker image pull ${VCW_REGISTRY}${repoName}
-    if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VWC_REGISTRY}${repoName} ${repoName}; fi
+    if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VCW_REGISTRY}${repoName} ${repoName}; fi
   ;;
   reset)
     echo "" > ${VCW_CURRENT_CONSOLE_SELECTION}
@@ -54,7 +54,7 @@ case $1 in
     if [[ "$port" == "" ]] ; then
       port="5000"
     fi
-    executionplane docker run -d -p ${port}:5000 --restart=always --name vcwc_registry_base_2 -v vcwc_registry_base_2_data:/var/lib/registry ${VWC_REGISTRY}vcwc/registry.base:2
+    executionplane docker run -d -p ${port}:5000 --restart=always --name vcwc_registry_base_2 -v vcwc_registry_base_2_data:/var/lib/registry ${VCW_REGISTRY}vcwc/registry.base:2
 	;;
   stop-registry)
     executionplane docker container rm --force vcwc_registry_base_2

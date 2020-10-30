@@ -17,6 +17,6 @@
 # Only required when working on Windows.
 #
 # config set-version <repository selector>
-# This build option assigns a specific value to the VWC_TAG environment variable.
+# This build option assigns a specific value to the VCW_TAG environment variable.
 #
 #

@@ -83,3 +83,5 @@ environment_module="${environment_module}# START DEPLOY SETTINGS$environment_dep
 "
 echo "$environment_module" > _stack/settings.stack
 rm $tmpfile
+
+chmod -R 777 _stack;

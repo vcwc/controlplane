@@ -7,7 +7,7 @@ do
 	if [[ -d module/configs/$volumeName ]] ; then
 		for f in $(find _module/configs/$volumeName ); do
 			if [[ -f $f ]] ; then cat $f | envsubst > ${f//configs/volumes};
-		elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
+			elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
+		done
 	fi
-	done
 done;

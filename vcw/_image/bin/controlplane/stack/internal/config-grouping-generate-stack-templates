@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ ! -d _stack/stacks ]] ; then mkdir _stack/stacks; fi
+
 environment_template=$'#!/usr/bin/env bash\n\n'
 docker_compose_template=$'---\nversion: \'3\'\nservices:\n\n'
 #IFS=',' read -r -a stacks <<< "$(echo ${VCW_STACK_GLOBAL_STACK_STACKS} | tr '\\' ' ' | tr '\n' ' ')"

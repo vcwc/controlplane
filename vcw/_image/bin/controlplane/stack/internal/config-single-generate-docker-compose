@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ ! -d _stack/stacks ]] ; then mkdir _stack/stacks; fi
+
 composeTemplate=/vcw/templates/docker-compose.yml.template
 destination=_stack/stacks/${VCW_STACK_GLOBAL_STACKNAMES}.docker-compose.yml
 

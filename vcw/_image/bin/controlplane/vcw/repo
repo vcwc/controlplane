@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_VCW"
 . executionplane-invoke "$0 $@"
 selectedNode="${@: -1}"
 if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
@@ -35,14 +35,14 @@ case "$1" in
 	;;
 	extract)
 		. executionplane-capture-output docker create ${imageName}
-		executionplane docker container cp $VWC_EXECUTIONPLANE_OUTPUT:/vcwc/repo/. .
+		executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcwc/repo/. .
 	;;
 	load)
 		executionplane docker image pull ${VCW_REGISTRY}${imageName}:${imageTag}
-		executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${VWC_REGISTRY}${imageName};
+		executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${VCW_REGISTRY}${imageName};
 		if [[ "${VCW_REGISTRY}" != "" ]] ; then
-			executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName};
-			executionplane docker tag ${VWC_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
+			executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName};
+			executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
 		fi
 	;;
 	log)
@@ -68,8 +68,8 @@ case "$1" in
 		executionplane git status
 	;;
 	tag-registry)
-		executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName
-		executionplane docker tag $imageName:$imageTag ${VWC_REGISTRY}$imageName:$imageTag
+		executionplane docker tag $imageName:$imageTag ${VCW_REGISTRY}$imageName
+		executionplane docker tag $imageName:$imageTag ${VCW_REGISTRY}$imageName:$imageTag
 	;;
 	--info)
 		. info-summary repo

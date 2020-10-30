@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+selectedNode="$1"
 
 executionplane docker network create -d overlay  "${VCW_STACK_NETWORKLOCAL}_overlay"
 executionplane docker network create -d overlay  "${VCW_STACK_NETWORKGLOBAL}_overlay"
@@ -16,11 +17,13 @@ for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
-	for f in $(find _stack/configs/$volumeName ); do
-		if [[ -f $f ]] ; then cat $f | envsubst > ${f//configs/volumes};
-	elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
-	done
-	executionplane --silent docker run -v ${volumeName}:${volumeDir} ${VCW_REGISTRY}$imageName cp -r _stack/volumes/${volumeName:10}/* ${volumeDir}
+	if [[ -d _stack/configs/$volumeName ]] ; then
+		for f in $(find _stack/configs/$volumeName ); do
+			if [[ -f $f ]] ; then cat $f | envsubst > ${f//configs/volumes};
+			elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
+		done
+	fi
+	executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${volumeName}:${volumeDir} ${VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/$selectedNode/_stack/volumes/${volumeName}/* ${volumeDir}/
 done;
 
 IFS=',' read -r -a stackNames <<< "${VCW_STACK_GLOBAL_STACKNAMES}"

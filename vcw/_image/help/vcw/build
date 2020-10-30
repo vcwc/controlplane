@@ -7,7 +7,7 @@
 #
 # build <repository selector>
 # The build method without arguments builds the repository container image
-# and tags the image with latest and the VWC_TAG.
+# and tags the image with latest and the VCW_TAG.
 #
 # build --deep <repository selector>
 # This _--deep_ flag force a recursive build of the base images recursively before building the container image.

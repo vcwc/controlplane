@@ -2,8 +2,8 @@
 version=$1
 rootPath=$2
 
-oldtext="$VWC_TAG"
-export VWC_TAG=$version
-sedstring="s/$oldtext/$VWC_TAG/g"
-sed -i "s/$oldtext/$VWC_TAG/g" "$rootPath/environment"
-executionplane-info "New Version: $VWC_TAG"
+oldtext="$VCW_TAG"
+export VCW_TAG=$version
+sedstring="s/$oldtext/$VCW_TAG/g"
+sed -i "s/$oldtext/$VCW_TAG/g" "$rootPath/environment"
+executionplane-info "New Version: $VCW_TAG"

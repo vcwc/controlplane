@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
+export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
 . executionplane-invoke "$0 $@"
 selectedNode="${@: -1}"
 if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
@@ -10,7 +10,8 @@ imageTag=$(git describe --tags HEAD)
 if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
 	. set-config $selectedNode
-	case $1 in
+	if [[ $# -gt 1 ]] ; then command="$1"; else command="all"; fi
+	case $command in
 		all)
 			config-package $selectedNode
 			config-module

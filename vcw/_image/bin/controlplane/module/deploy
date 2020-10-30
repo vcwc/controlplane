@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export PATH="$VWC_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
+export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
 . executionplane-invoke "$0 $@"
 selectedNode="${@: -1}"
 if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi

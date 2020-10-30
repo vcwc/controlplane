@@ -43,12 +43,12 @@ do
 	if [[ -d _module/volumes/${volumeName} ]] ; then
 		echo "
 if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker run -v vcw_controlplane_repos:/vcw/pwd -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /vcw/pwd/${selectedNode}/_module/volumes/${volumeName}/* ${volumeDir}
+	executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_module/volumes/${volumeName}/* ${volumeDir}
 fi" >> _module/deploy-local-up
 	else
 		echo "
 if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker run -v vcw_controlplane_repos:/vcw/pwd -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar -C / -xvf /vcw/pwd/${selectedNode}/_module/volumes/${volumeName}.tar
+	executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar -C / -xvf /source/${selectedNode}/_module/volumes/${volumeName}.tar
 fi" >> _module/deploy-local-up
 	fi
 done;

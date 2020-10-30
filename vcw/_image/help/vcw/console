@@ -24,7 +24,7 @@
 #
 # console extract-repo [repository short name]
 # Extracts the repository from the container image specified by [repository short name].
-# The [repository short name] consists of $VWC_IMAGE.$VWC_FLAVOR, i.e. the last two name parts dot separated before the image tag.
+# The [repository short name] consists of $VCW_IMAGE.$VCW_FLAVOR, i.e. the last two name parts dot separated before the image tag.
 #
 # console load ['--from-tar' optional] [image name] [image tag - optional]
 # With `--from-tar` it loads the image from the `tar` file stored in the `/images` folder.

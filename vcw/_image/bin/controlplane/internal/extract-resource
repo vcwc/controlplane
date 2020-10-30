@@ -12,9 +12,9 @@ requiredTag="$4"
 		cd $rootPath
 		. $rootPath/environment
 		if [[ "$requiredTag" == "" ]] ; then
-			requiredTag="${VWC_TAG}"
+			requiredTag="${VCW_TAG}"
 		fi
-		if [[ "$requiredTag" == "${VWC_TAG}" ]] ; then
+		if [[ "$requiredTag" == "${VCW_TAG}" ]] ; then
 			if [[ -f $rootPath/$input ]] ; then
 				cp $rootPath/$input $output
 			else
@@ -31,7 +31,7 @@ requiredTag="$4"
 	fi
 
 	if [[ "$extractFromImage" == "true" ]] ; then
-		. executionplane-capture-output docker create "${VWC_REGISTRY}$imageName"
-		executionplane docker container cp ${VWC_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${input} $output
+		. executionplane-capture-output docker create "${VCW_REGISTRY}$imageName"
+		executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${input} $output
 	fi
 )
