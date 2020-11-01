@@ -1,36 +1,31 @@
 #!/usr/bin/env bash
-imageName="$1"
-component="$2"
-if [[ "$component" == "." ]] ; then component=""; fi
 DOLLAR='$'
 
-componentFolder="soleco"
-if [[ "$component" != "" ]] ; then componentFolder="soleco/$component"; fi
-. invoke-script $imageName ${componentFolder}/_component/_configuration
+if [[ -f ${componentPath}/_component/configuration ]] ; then . ${componentPath}/_component/configuration; else . ${componentPath}/_configuration/configuration;  fi
 
 # solutions have solution level configuration
 # use solution namespace suffix as prefix for local network and module prefix
-if [[ "${CONTECO_ECOSYSTEM_RUNTIME}" != "${CONTECO_NAME_CONTROLPLANE}" ]] ; then
-  prefix="${CONTECO_ECOSYSTEM_RUNTIME:${#CONTECO_NAME_CONTROLPLANE}+1}_"
-fi
-if [[ "$component" != "" ]] ; then
-  if [[ "$SOLECO_HIDE_COMPONENT" == "true" ]] ; then
-    suffix="$(dirname "/$component" | tr '/' '_')"
-    if [[ "$suffix" == "_" ]] ; then suffix=""; fi
-    urlSuffix="$(dirname "/$component")";
-    if [[ "$urlSuffix" == "/" ]] ; then urlSuffix=""; fi
-  else
-    suffix="$(echo "/$component" | tr '/' '_')"
-    urlSuffix="/$component";
-  fi
-fi
-export VCW_STACK_HOSTNAME="${SOLECO_HOSTNAME}"
-export CONTECO_NETWORKGLOBAL="${CONTECO_NAME_CONTROLPLANE}"
-export CONTECO_NETWORKLOCAL="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
-export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
-export VCW_STACK_MODULE_URLPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
-export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
+#if [[ "${CONTECO_ECOSYSTEM_RUNTIME}" != "${CONTECO_NAME_CONTROLPLANE}" ]] ; then
+#  prefix="${CONTECO_ECOSYSTEM_RUNTIME:${#CONTECO_NAME_CONTROLPLANE}+1}_"
+#fi
+#if [[ "$component" != "" ]] ; then
+#  if [[ "$SOLECO_HIDE_COMPONENT" == "true" ]] ; then
+#    suffix="$(dirname "/$component" | tr '/' '_')"
+#    if [[ "$suffix" == "_" ]] ; then suffix=""; fi
+#    urlSuffix="$(dirname "/$component")";
+#    if [[ "$urlSuffix" == "/" ]] ; then urlSuffix=""; fi
+#  else
+#    suffix="$(echo "/$component" | tr '/' '_')"
+#    urlSuffix="/$component";
+#  fi
+#fi
+#export VCW_STACK_HOSTNAME="${SOLECO_HOSTNAME}"
+#export CONTECO_NETWORKGLOBAL="${CONTECO_NAME_CONTROLPLANE}"
+#export CONTECO_NETWORKLOCAL="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
+#export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${suffix}"
+#export VCW_STACK_MODULE_URLPREFIX="${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
+#export VCW_STACK_MODULEPREFIX="${prefix}${CONTECO_TYPE}_${CONTECO_NAME}${urlSuffix}"
 
 # solution level config overrides component
-. invoke-script $imageName soleco/configuration
-. invoke-script $imageName ${componentFolder}/_component/_configuration
+#. invoke-script $imageName soleco/configuration
+#. invoke-script $imageName ${componentFolder}/_component/_configuration

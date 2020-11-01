@@ -27,7 +27,6 @@ networks: {${DOLLAR}{VCW_STACK_GLOBAL_NETWORKS}}
 volumes: {${DOLLAR}{VCW_STACK_GLOBAL_VOLUMES}}
 ${DOLLAR}{VCW_STACK_GLOBAL_COMPOSE_EXTENSIONS}
 "
-
 echo "$environment_template" > _stack/settings.tmp
 sed -i -e "s/VCW_STACK_/${VCW_STACK_GLOBAL_STACKNAMES^^}_/g" _stack/settings.tmp
 sed -i -e "s/VCW_STACK_${VCW_STACK_GLOBAL_STACKNAMES^^}_GLOBAL/VCW_STACK_GLOBAL/g" _stack/settings.tmp

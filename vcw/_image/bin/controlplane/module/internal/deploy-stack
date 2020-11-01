@@ -5,11 +5,11 @@ stack="$3"
 
 # create module overlay network - global
 if [[ "$method" == *"down"* ]] ; then
-  executionplane --silent docker network rm ${VCW_STACK_NETWORKLOCAL}_overlay
+  executionplane --silent docker network rm ${VCW_STACK_GLOBAL_NETWORKLOCAL}_overlay
 fi
 if [[ "$method" == *"up"* ]] ; then
-  executionplane --silent docker network create -d overlay ${VCW_STACK_NETWORKGLOBAL}_overlay
-  executionplane --silent docker network create -d overlay ${VCW_STACK_NETWORKLOCAL}_overlay
+  executionplane --silent docker network create -d overlay ${VCW_STACK_GLOBAL_NETWORKGLOBAL}_overlay
+  executionplane --silent docker network create -d overlay ${VCW_STACK_GLOBAL_NETWORKLOCAL}_overlay
 fi
 
 # create module package volumes - on all nodes

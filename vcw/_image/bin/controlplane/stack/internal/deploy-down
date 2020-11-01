@@ -7,8 +7,8 @@ do
 	executionplane docker stack remove  "$stackName"
 done;
 
-executionplane docker network rm  "${VCW_STACK_NETWORKLOCAL}_overlay"
-executionplane docker network rm  "${VCW_STACK_NETWORKGLOBAL}_overlay"
+executionplane docker network rm  "${VCW_STACK_GLOBAL_NETWORKLOCAL}_overlay"
+executionplane docker network rm  "${VCW_STACK_GLOBAL_NETWORKGLOBAL}_overlay"
 executionplane docker container prune --force
 
 if [[ "$VCW_STACK_GLOBAL_VOLUME_LIST" != "" ]] ; then

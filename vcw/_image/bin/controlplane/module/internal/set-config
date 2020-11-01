@@ -2,8 +2,8 @@
 module=$(echo "$1" | tr '/' '_')
 
 DOLLAR='$'
-export VCW_STACK_NETWORKGLOBAL="vcw_global"
-export VCW_STACK_NETWORKLOCAL="${module}"
+export VCW_STACK_GLOBAL_NETWORKGLOBAL="vcw_global"
+export VCW_STACK_GLOBAL_NETWORKLOCAL="${module}"
 export VCW_STACK_MODULEPREFIX="${module}"
 export VCW_STACK_MODULE_URLPREFIX="${selectedNode}"
 export VCW_STACK_HOSTNAME="${DOLLAR}{VCW_HOSTNAME}"

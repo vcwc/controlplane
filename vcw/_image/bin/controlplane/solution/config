@@ -1,44 +1,52 @@
 #!/usr/bin/env bash
+export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_SOLUTION"
+. executionplane-invoke "$0 $@"
+selectedNode="${@: -1}"
+if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+cd /vcw/pwd/${selectedNode}
+imageTag=$(git describe --tags HEAD)
+
+if [[ $# -gt 1 ]] ; then command="$1"; shift; else command="all"; fi
+if [[ $# -gt 1 ]] ; then component="$1"; shift; fi
+if [[ "$component" == "." ]] ; then component=""; fi
+
+if [[ ! -f _solution/configuration ]] ; then executionplane-error "Solution configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+if [[ "$component" == "" ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
+if [[ ! -f ${componentPath}/_configuration/configuration ]] ; then executionplane-error "Solution component configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
-	export PATH="$CONTECO_EXECUTIONPLANE_APIINTERNALPATH_SOLECO"
-	. executionplane-invoke "$0 $@"
-	imageName="${@: -1}"
-	. invoke-script $imageName environment
-	command=$1; shift;
-	if [[ "$1" != "$imageName" ]] ; then component="$1"; shift; else component="."; fi
+	. set-config
 	case $command in
 		all)
-			if [[ "$component" == "." ]] ; then config build $imageName; fi
-			if [[  " backup " != *"$CONTECO_TYPE"* ]] ; then
-				config module $component $imageName
-				config component $component $imageName
-				config deploy $component $imageName
-				config volume $component $imageName
-				config solution $component $imageName
-			fi
+#			config module $component $imageName
+#			config component $component $imageName
+#			config deploy $component $imageName
+#			config volume $component $imageName
+#			config solution $component $imageName
 		;;
 		component)
-			config-component $imageName $component
-			config-descendant $imageName $component component
+#			config-component $imageName $component
+#			config-descendant $imageName $component component
 		;;
 		deploy)
-			config-deploy $imageName $component
-			config-descendant $imageName $component deploy
+#			config-deploy $imageName $component
+#			config-descendant $imageName $component deploy
 		;;
 		module)
-			config-module $imageName $component
-			config-descendant $imageName $component module
+			config-module $selectedNode $component
+#			config-descendant $imageName $component module
 		;;
 		solution)
-			config-solution . $imageName
+#			config-solution . $imageName
 		;;
 		volume)
-			config-volume $imageName $component
-			config-descendant $imageName $component volume
+#			config-volume $imageName $component
+#			config-descendant $imageName $component volume
 		;;
 		*)
-			.base config $command $component $@
-    ;;
+			executionplane-error "Method not recognised: $1."
+		;;
 	esac
-  executionplane-complete
-)
+	)
+cd /vcw/pwd
+executionplane-complete

@@ -15,13 +15,13 @@ if [[ " up down " != *"$command"* ]]; then command="up"; fi
 
 if [[ ! -f _stack/settings.stack ]] ; then executionplane-error "Stack settings file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 
-export VCW_STACK_URLPREFIX="vcw_stack"
-export VCW_STACK_NETWORKLOCAL="vcw_stack"
-export VCW_STACK_NETWORKGLOBAL="vcw_global"
+export VCW_STACK_GLOBAL_URLPREFIX="vcw_stack"
+export VCW_STACK_GLOBAL_NETWORKLOCAL="vcw_stack"
+export VCW_STACK_GLOBAL_NETWORKGLOBAL="vcw_global"
 
 . _stack/settings.stack;
-export VCW_STACK_STACKPREFIX="$VCW_STACK_GLOBAL_STACKNAMES"
-if [[ "$VCW_STACK_STACKPREFIX" == *","* ]] ; then export VCW_STACK_STACKPREFIX=$(echo ${VCW_STACK_STACKPREFIX} | cut -d',' -f1); fi
+export VCW_STACK_GLOBAL_STACKPREFIX="$VCW_STACK_GLOBAL_STACKNAMES"
+if [[ "$VCW_STACK_GLOBAL_STACKPREFIX" == *","* ]] ; then export VCW_STACK_GLOBAL_STACKPREFIX=$(echo ${VCW_STACK_GLOBAL_STACKPREFIX} | cut -d',' -f1); fi
 . _stack/settings.stack;
 
 deploy-${command} $selectedNode

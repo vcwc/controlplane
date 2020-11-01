@@ -13,8 +13,8 @@ package=${columns[1]}
 stack=${columns[2]}
 if [[ " boot start " == *" $action"* ]] ; then
 (
-	export VCW_STACK_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
-	export VCW_STACK_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/$package"
+	export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
+	export VCW_STACK_GLOBAL_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/$package"
 	. _module/packages/$package/settings.package
 	. _module/packages/$package/settings
 

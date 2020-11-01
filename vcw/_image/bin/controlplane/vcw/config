@@ -26,6 +26,10 @@ case $1 in
 		shift;
 		.module config $@
 	;;
+	solution)
+		shift;
+		.solution config $@
+	;;
 	stack)
 		shift;
 		.stack config $@

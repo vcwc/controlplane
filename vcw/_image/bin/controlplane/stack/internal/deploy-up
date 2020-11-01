@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 selectedNode="$1"
 
-executionplane docker network create -d overlay  "${VCW_STACK_NETWORKLOCAL}_overlay"
-executionplane docker network create -d overlay  "${VCW_STACK_NETWORKGLOBAL}_overlay"
+executionplane docker network create -d overlay  "${VCW_STACK_GLOBAL_NETWORKLOCAL}_overlay"
+executionplane docker network create -d overlay  "${VCW_STACK_GLOBAL_NETWORKGLOBAL}_overlay"
 
 if [[ "$VCW_STACK_GLOBAL_VOLUME_LIST" != "" ]] ; then
 	IFS=',' read -r -a volumes <<< "${VCW_STACK_GLOBAL_VOLUME_LIST}"

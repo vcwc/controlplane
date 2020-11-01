@@ -1,49 +1,25 @@
 #!/usr/bin/env bash
-imageName=$1
+selectedNode="$1"
 component=$2
+if [[ "$component" == "" ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
-folder="soleco"
-if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
-componentPath="/conteco/pwd/${imageName}/${folder}"
+if [[ -d ${componentPath}/_module ]] ; then rm -rf ${componentPath}/_module; fi
 
-# set-config can only be used after config-volume
-. invoke-script $imageName "${folder}/_configuration/_configuration"
-
-if [[ ! -d ${componentPath}/_module ]] ; then mkdir ${componentPath}/_module; fi
-if [[ ! -d ${componentPath}/_import ]] ; then mkdir ${componentPath}/_import; fi
-tmpFolder="${componentPath}/_import"
-
-# copy modeco folder from module
-if [[ "$SOLECO_MODULE" == *"."*"."* ]] ; then moduleImage="${CONTECO_REGISTRY}${CONTECO_REALM_RUNTIME}/modeco_${SOLECO_MODULE}";
-else moduleImage="${CONTECO_REGISTRY}${CONTECO_REALM_RUNTIME}/modeco.${SOLECO_MODULE}"; fi
-if [[ "$SOLECO_MODULE_VERSION" != "" ]] ; then moduleImage="${moduleImage}:${SOLECO_MODULE_VERSION}"; fi
-
-docker run -v ${CONTECO_PWD_VOLUME}:/conteco/pwd $moduleImage cp -r /modeco/* $tmpFolder
-
-# copy module packages
-rm $tmpFolder/packages/*/*.conteco > /dev/null 2>&1
-cp -r $tmpFolder/packages/*/* ${componentPath}/_module > /dev/null 2>&1
-
-# copy module volumes
-rm -rf $tmpFolder/volumes/packages > /dev/null 2>&1
-if [[ ! -d ${componentPath}/_module/_volumes ]] ; then mkdir ${componentPath}/_module/_volumes; fi
-cp -r $tmpFolder/volumes/* ${componentPath}/_module/_volumes > /dev/null 2>&1
-
-# copy module configuration files
-cp $tmpFolder/configuration ${componentPath}/_module/_configuration
-cp $tmpFolder/module-stacks ${componentPath}/_module/stacks
-cp $tmpFolder/module-volumes ${componentPath}/_module/volumes
-cp $tmpFolder/module-volumes-initialised ${componentPath}/_module/volumes-initialised
+moduleImage=$(echo ${VCW_COMPONENT_MODULE} | cut -d'/' -f1-2);
+moduleSubNode=$(echo ${VCW_COMPONENT_MODULE} | cut -d'/' -f3-)
+if [[ "$moduleSubnode" != "" ]] ; then moduleSubnode="${moduleSubnode}/"; fi
+. executionplane-capture-output docker create ${VCW_REGISTRY}${moduleImage}
+executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${moduleSubNode}_module /vcw/pwd/${selectedNode}/${componentPath}/_module
 
 # iterate over initialised volumes and copy contents from configs folder into configs folder withinin _module
 # this gives a clean starting position
-IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_module/volumes-initialised
-for volumeSettings in ${volumes[@]};
-do
-	volumeName=$(echo $volumeSettings | cut -d':' -f 1);
-	if [[ ! -d ${componentPath}/_module/_configs ]] ; then mkdir ${componentPath}/_module/_configs; fi;
-	if [[ -d $tmpFolder/configs/$volumeName ]] ; then cp -r $tmpFolder/configs/$volumeName ${componentPath}/_module/_configs; fi
-done;
-
-rm -rf $tmpFolder
-chmod -R 777 $componentPath
+#IFS=$'\n' read -d '' -r -a volumes < ${componentPath}//_module/volumes-initialised
+#for volumeSettings in ${volumes[@]};
+#do
+#	volumeName=$(echo $volumeSettings | cut -d':' -f 1);
+#	if [[ ! -d ${componentPath}//_module/_configs ]] ; then mkdir ${componentPath}//_module/_configs; fi;
+#	if [[ -d $tmpFolder/configs/$volumeName ]] ; then cp -r $tmpFolder/configs/$volumeName ${componentPath}/_module/_configs; fi
+#done;
+#
+#rm -rf $tmpFolder
+#chmod -R 777 $componentPath
