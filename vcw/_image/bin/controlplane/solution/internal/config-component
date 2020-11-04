@@ -1,52 +1,77 @@
 #!/usr/bin/env bash
-shopt -s nullglob
-imageName=$1
+selectedNode="$1"
 component=$2
+if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
-folder="soleco"
-if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
-componentPath="/conteco/pwd/${imageName}/${folder}"
+cp ${componentPath}/_configuration/module.configuration ${componentPath}/_component/configuration
+cat ${componentPath}/_configuration/configuration >> ${componentPath}/_component/configuration
+cp ${componentPath}/_configuration/stacks ${componentPath}/_component/stacks
+cp ${componentPath}/_configuration/volumes ${componentPath}/_component/volumes
+cp ${componentPath}/_configuration/volumes-initialised ${componentPath}/_component/volumes-initialised
 
-# set-config can only be used after config-volume
-. invoke-script $imageName "${folder}/_configuration/_configuration"
+. set-config $selectedNode
 
-if [[ ! -d ${componentPath}/_component ]] ; then
-	mkdir ${componentPath}/_component
-fi
+DOLLAR='$'
+echo $'#!/usr/bin/env bash\n' > ${componentPath}/_component/deploy-local-down
+echo $'#!/usr/bin/env bash\n' > ${componentPath}/_component/deploy-local-up
 
-# copy module to component
-cp -r ${componentPath}/_module/* ${componentPath}/_component
+echo "executionplane --silent docker container prune --force" >> ${componentPath}/_component/deploy-local-down
+IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_component/volumes
+for volume in ${volumes[@]};
+do
+	echo "continue=\"true\"
+while [[ \"true\" == \"${DOLLAR}continue\" ]] ;
+do
+	executionplane docker volume rm \"${VCW_STACK_MODULEPREFIX}__${volume}\"
+	result=${DOLLAR}(docker volume ls | grep \"${VCW_STACK_MODULEPREFIX}__${volume}\")
+	if [[ \"${DOLLAR}result\" == \"\" ]] ; then
+		continue=\"false\"
+	else
+		sleep 3;
+	fi
+done;
+	" >> ${componentPath}/_component/deploy-local-down
 
-# put a copy of stacks, volumes and volumes-initialised in _configuration if none present
-if [[ ! -f ${componentPath}/_configuration/stacks ]] ; then cp ${componentPath}/_module/stacks ${componentPath}/_configuration/stacks; fi
-if [[ ! -f ${componentPath}/_configuration/volumes ]] ; then cp ${componentPath}/_module/volumes ${componentPath}/_configuration/volumes; fi
-if [[ ! -f ${componentPath}/_configuration/volumes-initialised ]] ; then cp ${componentPath}/_module/volumes-initialised ${componentPath}/_configuration/volumes-initialised; fi
+echo "executionplane --silent docker volume create ${VCW_STACK_MODULEPREFIX}__${volume}
+	" >> ${componentPath}/_component/deploy-local-up
+done;
 
-# copy _configs folder to _configuration if not present
-if [[ -d ${componentPath}/_module/_configs ]] ; then
-	if [[ ! -d ${componentPath}/_configuration/_configs ]] ; then mkdir ${componentPath}/_configuration/_configs; fi
-	for f in ${componentPath}/_module/_configs/*
+IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_component/volumes-initialised
+for volumeSettings in ${volumes[@]};
+do
+	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
+	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
+	if [[ -d "${componentPath}/_component/_volumes/${volumeName}" ]] ; then
+		echo "
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_module/volumes/${volumeName}/* ${volumeDir}
+" >> ${componentPath}/_component/deploy-local-up
+	else
+		echo "
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar -C / -xvf /source/${selectedNode}/_module/volumes/${volumeName}.tar
+" >> ${componentPath}/_component/deploy-local-up
+	fi
+done;
+
+chmod -R 777 $componentPath/_component/deploy-local*
+
+if [[ -d ${componentPath}/_configuration/_volumes ]] ; then
+  rm -rf ${componentPath}/_component/_volumes/*
+  for f in ${componentPath}/_configuration/_volumes/*
 	do
-		folderName="$(basename $f)"
-		if [[ ! -d ${componentPath}/_configuration/_configs/$folderName ]] ; then cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs; fi
-	done;
+    itemName="$(basename $f)"
+    if [[ -d ${componentPath}/_configuration/_volumes/$itemName ]] ; then cp -r ${componentPath}/_configuration/_volumes/$itemName ${componentPath}/_component/_volumes;
+    else cp -r ${componentPath}/_configuration/_volumes/$itemName ${componentPath}/_component/_volumes/$itemName; fi
+  done;
 fi
 
-# copy _volumes folder to _configuration if not present
-if [[ -d ${componentPath}/_module/_volumes ]] ; then
-	if [[ ! -d ${componentPath}/_configuration/_volumes ]] ; then mkdir ${componentPath}/_configuration/_volumes; fi
-	for f in ${componentPath}/_module/_volumes/*
-	do
-		if [[ -f $f ]] ; then
-			fileName="$(basename $f)"
-			if [[ ! -f ${componentPath}/_configuration/_volumes/$ileName ]] ; then
-				cp ${componentPath}/_module/_volumes/$fileName ${componentPath}/_configuration/_volumes/$fileName
-			fi
-		else
-			folderName="$(basename $f)"
-			if [[ ! -d ${componentPath}/_configuration/_volumes/$folderName ]] ; then cp -r ${componentPath}/_module/_volumes/$folderName ${componentPath}/_configuration/_volumes; fi
-		fi
-	done;
-fi
-
-chmod -R 777 $componentPath
+IFS=$'\n' read -d '' -r -a volumes < $componentPath/_component/volumes-initialised
+for volumeSettings in ${volumes[@]};
+do
+	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
+	if [[ -d _configuration/_configs/$volumeName ]] ; then
+		for f in $(find _configuration/_configs/$volumeName ); do
+			if [[ -f $f ]] ; then cat $f | envsubst > ${f//_configuration\/_configs/_component\/_volumes};
+			elif [[ ! -d ${f//_configuration\/_configs/_component\/_volumes} ]] ; then mkdir ${f//_configs/_component/_component\/_volumes}; fi
+		done
+	fi
+done;

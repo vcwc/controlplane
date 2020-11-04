@@ -10,13 +10,17 @@
   imageTag=$(git describe --tags HEAD)
 
   case $1 in
-    stack)
-      shift;
-  		.stack deploy $@
-  	;;
     module)
       shift;
   		.module deploy $@
+  	;;
+    solution)
+      shift;
+  		.solution deploy $@
+  	;;
+    stack)
+      shift;
+  		.stack deploy $@
   	;;
     *)
       executionplane-error "Method not recognised: $1."

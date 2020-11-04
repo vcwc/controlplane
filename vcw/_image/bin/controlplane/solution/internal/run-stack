@@ -1,57 +1,44 @@
 #!/usr/bin/env bash
-imageName="$1"
-action="$2"
-component="$3"
-stackSelector="$4"
-shift; shift; shift; shift;
-folder="soleco"
-if [[ "$component" != "." ]] ; then folder="soleco/$component"; fi
+action="$1"
+component="$2"
+stackSelector="$3"
+shift; shift; shift;
 
-# local and global network prefix
-. set-config $imageName $component
-
+if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 if [[ "$stackSelector" == "." ]] ; then stackSelector=""; fi
 if [[ "$stackSelector" != "" && "$stackSelector" != "_"* ]] ; then stackSelector=",$stackSelector"; fi
 
-tmpfilef=$(mktemp /tmp/extract-resource.XXXXXX)
-
-extract-resource $imageName "${folder}/_component/stacks" $tmpfilef
-cat $tmpfilef | grep "$action" | grep "$stackSelector" | while read -r line ; do
+cat $componentPath/_component/stacks | grep $action | grep "$stackSelector" | while read -r line ; do
 		IFS=',' read -r -a columns <<< "$line"
 		(
 		stacktype=${columns[0]}
 		package=${columns[1]}
-		instance=${columns[2]}
-		stack=${columns[3]}
-		export CONTECO_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$instance"
+		stack=${columns[2]}
+		export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
 		stackName="${VCW_STACK_MODULEPREFIX}__${stack}"
 		if (( ${#stackName} > 50 )) ; then
 			let "excess = ${#stackName} - 45 - ${#VCW_STACK_MODULEPREFIX}";
 			stackName="${VCW_STACK_MODULEPREFIX}__X_${stackName:excess:${#stackName}}";
-			export CONTECO_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__X_${instance:excess:${#instance}}";
+			export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__X_${stackName:excess:${#stackName}}";
 		fi;
 		if [[ " boot start " == *" $action"* ]] ; then
-			export CONTECO_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${instance}"
-			tmpfilep=$(mktemp /tmp/docker-compose.yml.XXXXXX)
+			export CONTECO_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${package}"
 			tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
-			stackFolder="${folder}/_component/$instance"
-			composeFile="$stackFolder/$stack.docker-compose.yml"
-			. invoke-script $imageName "$stackFolder/settings.package"
-			. invoke-script $imageName "$stackFolder/settings"
+			stackFolder=${componentPath}/_component/$package
+			composeFile=${stackFolder}/_${stack}.docker-compose.yml
+			. $stackFolder/settings.package
+			. $stackFolder/settings
 			if [[ "$action" == "start" ]] ; then
 				interactive="${stack^^}_COMMAND_INTERACTIVE"
 				command="${stack^^}_COMMAND"
 				if [[ "${!interactive}" == "true" ]]; then export ${stack^^}_COMMAND="'.invoke $* '"; fi
 			fi
-			extract-resource $imageName $composeFile $tmpfilep
-			cat $tmpfilep | envsubst > $tmpfile
+			cat $composeFile | envsubst > $tmpfile
 			cat $tmpfile
 			executionplane  docker stack deploy -c $tmpfile "$stackName"
-			rm $tmpfilep
 			rm $tmpfile
 		elif [[ " shutdown stop " == *" $action"* ]] ; then
 			executionplane docker stack rm "$stackName"
 		fi
 		)
 done
-rm $tmpfilef

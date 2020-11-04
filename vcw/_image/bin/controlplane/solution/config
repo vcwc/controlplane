@@ -9,39 +9,29 @@ imageTag=$(git describe --tags HEAD)
 
 if [[ $# -gt 1 ]] ; then command="$1"; shift; else command="all"; fi
 if [[ $# -gt 1 ]] ; then component="$1"; shift; fi
-if [[ "$component" == "." ]] ; then component=""; fi
+if [[ "$component" == "" ]] ; then component="."; fi
 
 if [[ ! -f _solution/configuration ]] ; then executionplane-error "Solution configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
-if [[ "$component" == "" ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
+if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 if [[ ! -f ${componentPath}/_configuration/configuration ]] ; then executionplane-error "Solution component configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
-	. set-config
+	. set-config $selectedNode
 	case $command in
 		all)
-#			config module $component $imageName
-#			config component $component $imageName
-#			config deploy $component $imageName
-#			config volume $component $imageName
-#			config solution $component $imageName
+			config module $component $selectedNode $selectedNode
+			config component $component $selectedNode $selectedNode
+			config solution . $selectedNode
 		;;
 		component)
-#			config-component $imageName $component
-#			config-descendant $imageName $component component
-		;;
-		deploy)
-#			config-deploy $imageName $component
-#			config-descendant $imageName $component deploy
+			config-component $selectedNode $component
+			component-child-axis $selectedNode $component config component
 		;;
 		module)
 			config-module $selectedNode $component
-#			config-descendant $imageName $component module
+			component-child-axis $selectedNode $component config module
 		;;
 		solution)
-#			config-solution . $imageName
-		;;
-		volume)
-#			config-volume $imageName $component
-#			config-descendant $imageName $component volume
+			config-solution .
 		;;
 		*)
 			executionplane-error "Method not recognised: $1."

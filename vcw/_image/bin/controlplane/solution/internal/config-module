@@ -1,25 +1,67 @@
 #!/usr/bin/env bash
+shopt -s nullglob
 selectedNode="$1"
 component=$2
-if [[ "$component" == "" ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
+if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
 if [[ -d ${componentPath}/_module ]] ; then rm -rf ${componentPath}/_module; fi
+if [[ -d ${componentPath}/_component ]] ; then rm -rf  ${componentPath}/_component; fi; mkdir ${componentPath}/_component
+if [[ ! -d ${componentPath}/_configuration ]] ; then mkdir ${componentPath}/_configuration; fi
 
-moduleImage=$(echo ${VCW_COMPONENT_MODULE} | cut -d'/' -f1-2);
-moduleSubNode=$(echo ${VCW_COMPONENT_MODULE} | cut -d'/' -f3-)
+moduleImage=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f1-2);
+moduleSubNode=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f3-)
 if [[ "$moduleSubnode" != "" ]] ; then moduleSubnode="${moduleSubnode}/"; fi
 . executionplane-capture-output docker create ${VCW_REGISTRY}${moduleImage}
 executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${moduleSubNode}_module /vcw/pwd/${selectedNode}/${componentPath}/_module
 
-# iterate over initialised volumes and copy contents from configs folder into configs folder withinin _module
-# this gives a clean starting position
-#IFS=$'\n' read -d '' -r -a volumes < ${componentPath}//_module/volumes-initialised
-#for volumeSettings in ${volumes[@]};
-#do
-#	volumeName=$(echo $volumeSettings | cut -d':' -f 1);
-#	if [[ ! -d ${componentPath}//_module/_configs ]] ; then mkdir ${componentPath}//_module/_configs; fi;
-#	if [[ -d $tmpFolder/configs/$volumeName ]] ; then cp -r $tmpFolder/configs/$volumeName ${componentPath}/_module/_configs; fi
-#done;
-#
-#rm -rf $tmpFolder
-#chmod -R 777 $componentPath
+cp ${componentPath}/_module/configuration ${componentPath}/_component/configuration
+cp ${componentPath}/_module/module-stacks ${componentPath}/_component/stacks
+cp ${componentPath}/_module/module-volumes ${componentPath}/_component/volumes
+cp ${componentPath}/_module/module-volumes-initialised ${componentPath}/_component/volumes-initialised
+
+cp -r ${componentPath}/_module/packages/* ${componentPath}/_component
+cp ${componentPath}/_component/configuration ${componentPath}/_configuration/module.configuration
+if [[ ! -f ${componentPath}/_configuration/stacks ]] ; then cp ${componentPath}/_component/stacks ${componentPath}/_configuration/stacks; fi
+cp ${componentPath}/_component/stacks ${componentPath}/_configuration/module.stacks
+if [[ ! -f ${componentPath}/_configuration/volumes ]] ; then cp ${componentPath}/_component/volumes ${componentPath}/_configuration/volumes; fi
+cp ${componentPath}/_component/volumes ${componentPath}/_configuration/module.volumes
+if [[ ! -f ${componentPath}/_configuration/volumes-initialised ]] ; then cp ${componentPath}/_component/volumes-initialised ${componentPath}/_configuration/volumes-initialised; fi
+cp ${componentPath}/_component/volumes-initialised ${componentPath}/_configuration/module.volumes-initialised
+
+if [[ -d ${componentPath}/_module/configs ]] ; then
+  if [[ ! -d ${componentPath}/_configuration/_configs ]] ; then mkdir ${componentPath}/_configuration/_configs; fi
+  if [[ -d ${componentPath}/_configuration/_configs.module ]] ; then rm -rf ${componentPath}/_configuration/_configs.module/*; fi
+	for f in ${componentPath}/_module/_configs/*
+	do
+		folderName="$(basename $f)"
+    if [[ "$folderName" != "_packages" ]] ; then
+      cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs.module
+		  if [[ ! -d ${componentPath}/_configuration/_configs/$folderName ]] ; then cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs/; fi
+    fi
+	done;
+fi
+
+if [[ -d ${componentPath}/_module/volumes ]] ; then
+  cp -r ${componentPath}/_module/volumes ${componentPath}/_component/_volumes;
+  if [[ -d ${componentPath}/_component/_volumes/_packages ]] ; then rm -rf ${componentPath}/_component/_volumes/_packages; fi
+  if [[ ! -d ${componentPath}/_configuration/_volumes ]] ; then mkdir ${componentPath}/_configuration/_volumes; fi
+  if [[ ! -d ${componentPath}/_configuration/_module.volumes ]] ; then mkdir ${componentPath}/_configuration/_module.volumes; fi
+  if [[ -d ${componentPath}/_configuration/_module.volumes ]] ; then rm -rf ${componentPath}/_configuration/_module.volumes/*; fi
+	for f in ${componentPath}/_module/volumes/*
+	do
+		if [[ -f $f ]] ; then
+			fileName="$(basename $f)"
+      cp ${componentPath}/_module/volumes/$fileName ${componentPath}/_configuration/_module.volumes/$fileName
+			if [[ ! -f ${componentPath}/_configuration/_volumes/$ileName ]] ; then cp ${componentPath}/_module/_volumes/$fileName ${componentPath}/_configuration/_volumes/$fileName; fi
+		else
+			folderName="$(basename $f)"
+#      executionplane-info "$folderName"
+      if [[ ! -d ${componentPath}/_configuration/_module.volumes/$folderName ]] ; then mkdir ${componentPath}/_configuration/_module.volumes/$folderName; fi
+      cp -r ${componentPath}/_module/volumes/$folderName/* ${componentPath}/_configuration/_module.volumes/$folderName
+			if [[ ! -d ${componentPath}/_configuration/_volumes/$folderName ]] ; then cp -r ${componentPath}/_module/volumes/$folderName ${componentPath}/_configuration/_volumes/; fi
+		fi
+	done;
+fi
+
+rm -rf ${componentPath}/_module
+chmod -R 777 ${componentPath}

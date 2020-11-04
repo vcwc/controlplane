@@ -1,38 +1,39 @@
 #!/usr/bin/env bash
-shopt -s nullglob
 component=$1
-imageName=$2
 
 if [[ "$component" == "." ]] ; then
-  parent="soleco";
+
+  componentPath="_solution";
   prefix=""
-  echo $'#!/usr/bin/env bash\n\n' > $imageName/soleco/_controlplane/deploy-volumes
-  echo $'#!/usr/bin/env bash\n\n' > $imageName/soleco/_controlplane/remove-volumes
+  echo $'#!/usr/bin/env bash\n\n' > _solution/_controlplane/deploy-volumes
+  echo $'#!/usr/bin/env bash\n\n' > _solution/_controlplane/remove-volumes
+  chmod +x ${componentPath}/_controlplane/deploy-volumes
+  chmod +x ${componentPath}/_controlplane/remove-volumes
   echo "
   ######################################################
   # THIS FILE IS AUTO-GENERATED - PLEASE DO NOT CHANGE #
   ######################################################
-" >> $imageName/soleco/_controlplane/deploy-volumes
+" >> _solution/_controlplane/deploy-volumes
   echo "
   ######################################################
   # THIS FILE IS AUTO-GENERATED - PLEASE DO NOT CHANGE #
   ######################################################
-" >> $imageName/soleco/_controlplane/remove-volumes
+" >> _solution/_controlplane/remove-volumes
+
 else
-  parent="soleco/$component";
+
+  componentPath="_solution/${component}";
   prefix="$component/"
+
 fi
 
-cat $imageName/${parent}/_component/deploy-local-down >> $imageName/soleco/_controlplane/remove-volumes
-cat $imageName/${parent}/_component/deploy-local-up >> $imageName/soleco/_controlplane/deploy-volumes
+cat ${componentPath}/_component/deploy-local-down >> _solution/_controlplane/remove-volumes
+cat ${componentPath}/_component/deploy-local-up >> _solution/_controlplane/deploy-volumes
 
-for folder in $imageName/$parent/*
+for folder in ${componentPath}/*
 do
   if [[ -d $folder ]] ;  then
     folderName="$(basename $folder)"
-    if [[ "$folderName" != "_"* ]] ; then config-solution "$prefix$folderName" $imageName; fi
+    if [[ "$folderName" != "_"* ]] ; then config-solution ${prefix}${folderName};fi
   fi
 done
-
-chmod +x $imageName/soleco/_controlplane/deploy-volumes
-chmod +x $imageName/soleco/_controlplane/remove-volumes
