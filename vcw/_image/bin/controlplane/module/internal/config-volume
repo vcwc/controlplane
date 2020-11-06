@@ -8,6 +8,6 @@ do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
 	if [[ "${VCW_STACK_MODULEPREFIX}__$volumeName"  == "$volumePrefix"* ]] ; then
-		executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeSettings} -v vcw_controlplane_repos:/vcw/pwd ${VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar cvf /vcw/pwd/${selectecNode}/_module/volumes/${volumeName}.tar ${volumeDir}
+		executionplane --silent docker run -v ${VCW_STACK_MODULEPREFIX}__${volumeSettings} -v vcw_controlplane_repos:/vcw/pwd ${VCW_REGISTRY}vcwc/controlplane.vcw console tar /vcw/pwd/${selectecNode}/_module/volumes/${volumeName}.tar ${volumeDir}
 	fi
 done;

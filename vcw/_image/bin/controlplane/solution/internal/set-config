@@ -25,7 +25,7 @@ else
   export VCW_STACK_GLOBAL_NETWORKGLOBAL="vcw_global"
   export VCW_STACK_GLOBAL_NETWORKLOCAL="${solution}"
   export VCW_STACK_MODULEPREFIX="${solution}"
-  export VCW_STACK_MODULE_URLPREFIX="${selectedNode}/${component}"
+  export VCW_STACK_MODULE_URLPREFIX="${selectedNode}"
 fi
 
 . _solution/configuration

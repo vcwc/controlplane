@@ -48,7 +48,7 @@ fi" >> _module/deploy-local-up
 	else
 		echo "
 if [[ \"${VCW_STACK_MODULEPREFIX}__${volumeName}\" == \"${DOLLAR}prefix\"* ]] ; then
-	executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar -C / -xvf /source/${selectedNode}/_module/volumes/${volumeName}.tar
+	executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console untar /source/${selectedNode}/_module/volumes/${volumeName}.tar
 fi" >> _module/deploy-local-up
 	fi
 done;

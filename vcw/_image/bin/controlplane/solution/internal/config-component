@@ -43,11 +43,11 @@ do
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
 	if [[ -d "${componentPath}/_component/_volumes/${volumeName}" ]] ; then
 		echo "
-executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_module/volumes/${volumeName}/* ${volumeDir}
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_solution/_component/_volumes/${volumeName}/* ${volumeDir}
 " >> ${componentPath}/_component/deploy-local-up
 	else
 		echo "
-executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd tar -C / -xvf /source/${selectedNode}/_module/volumes/${volumeName}.tar
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console untar /source/${selectedNode}/_solution/_component/_volumes/${volumeName}.tar
 " >> ${componentPath}/_component/deploy-local-up
 	fi
 done;

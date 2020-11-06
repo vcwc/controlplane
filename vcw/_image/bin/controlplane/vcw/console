@@ -60,10 +60,19 @@ case $1 in
     executionplane docker container rm --force vcwc_registry_base_2
     executionplane docker volume rm --force vcwc_registry_base_2_data
   ;;
+  tar)
+    tar cvf $2 $3  > /dev/null
+  ;;
   unload)
     repoName="$2"
     executionplane docker image rm --force ${VCW_REGISTRY}${repoName}
     if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker image rm --force ${VCW_REGISTRY}${repoName}; fi
+  ;;
+  untar)
+    tar -C / -xvf $2  > /dev/null
+  ;;
+  with)
+    executionplane-info "console $@"
   ;;
  *)
     executionplane-error "Method not recognised: $1."

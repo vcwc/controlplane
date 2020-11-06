@@ -32,7 +32,7 @@ if [[ "$VCW_STACK_GLOBAL" != *"VCW_STACK_GLOBAL_VOLUMES"* ]] ; then
 "
 fi
 if [[ "$VCW_STACK_GLOBAL" != *"VCW_STACK_GLOBAL_NETWORKS"* ]] ; then
-	environment_file="${environment_file}export VCW_STACK_GLOBAL_NETWORKS=\"${DOLLAR}{CONTECO_TYPE}_overlay: { external: true }\"
+	environment_file="${environment_file}export VCW_STACK_GLOBAL_NETWORKS=\"${DOLLAR}{VCW_STACK_GLOBAL_NETWORKGLOBAL}_overlay: { external: true }\"
 "
 fi
 environment_file="${environment_file}# END TOPLEVEL SETTINGS

@@ -22,7 +22,7 @@ cat $componentPath/_component/stacks | grep $action | grep "$stackSelector" | wh
 			export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__X_${stackName:excess:${#stackName}}";
 		fi;
 		if [[ " boot start " == *" $action"* ]] ; then
-			export CONTECO_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${package}"
+			export VCW_STACK_GLOBAL_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${package}"
 			tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 			stackFolder=${componentPath}/_component/$package
 			composeFile=${stackFolder}/_${stack}.docker-compose.yml

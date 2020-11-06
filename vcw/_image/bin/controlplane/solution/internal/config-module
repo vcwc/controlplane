@@ -4,15 +4,18 @@ selectedNode="$1"
 component=$2
 if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
+. ${componentPath}/_configuration/configuration
+
 if [[ -d ${componentPath}/_module ]] ; then rm -rf ${componentPath}/_module; fi
 if [[ -d ${componentPath}/_component ]] ; then rm -rf  ${componentPath}/_component; fi; mkdir ${componentPath}/_component
 if [[ ! -d ${componentPath}/_configuration ]] ; then mkdir ${componentPath}/_configuration; fi
 
 moduleImage=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f1-2);
-moduleSubNode=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f3-)
+moduleSubNode=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f3-);
 if [[ "$moduleSubnode" != "" ]] ; then moduleSubnode="${moduleSubnode}/"; fi
+if [[ "$moduleImage" == "" ]] ; then executionplane-error "Module image is undefined!"; exit; fi
 . executionplane-capture-output docker create ${VCW_REGISTRY}${moduleImage}
-executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${moduleSubNode}_module /vcw/pwd/${selectedNode}/${componentPath}/_module
+executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${moduleSubNode}/_module /vcw/pwd/${selectedNode}/${componentPath}/_module
 
 cp ${componentPath}/_module/configuration ${componentPath}/_component/configuration
 cp ${componentPath}/_module/module-stacks ${componentPath}/_component/stacks
@@ -30,13 +33,14 @@ cp ${componentPath}/_component/volumes-initialised ${componentPath}/_configurati
 
 if [[ -d ${componentPath}/_module/configs ]] ; then
   if [[ ! -d ${componentPath}/_configuration/_configs ]] ; then mkdir ${componentPath}/_configuration/_configs; fi
-  if [[ -d ${componentPath}/_configuration/_configs.module ]] ; then rm -rf ${componentPath}/_configuration/_configs.module/*; fi
-	for f in ${componentPath}/_module/_configs/*
+  if [[ ! -d ${componentPath}/_configuration/_module.configs ]] ; then mkdir ${componentPath}/_configuration/_module.configs; fi
+  rm -rf ${componentPath}/_configuration/_module.configs/*;
+	for f in ${componentPath}/_module/configs/*
 	do
 		folderName="$(basename $f)"
     if [[ "$folderName" != "_packages" ]] ; then
-      cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs.module
-		  if [[ ! -d ${componentPath}/_configuration/_configs/$folderName ]] ; then cp -r ${componentPath}/_module/_configs/$folderName ${componentPath}/_configuration/_configs/; fi
+      cp -r ${componentPath}/_module/configs/$folderName ${componentPath}/_configuration/_module.configs/$folderName
+		  if [[ ! -d ${componentPath}/_configuration/_configs/$folderName ]] ; then cp -r ${componentPath}/_module/configs/$folderName ${componentPath}/_configuration/_configs/$folderName; fi
     fi
 	done;
 fi
@@ -52,7 +56,7 @@ if [[ -d ${componentPath}/_module/volumes ]] ; then
 		if [[ -f $f ]] ; then
 			fileName="$(basename $f)"
       cp ${componentPath}/_module/volumes/$fileName ${componentPath}/_configuration/_module.volumes/$fileName
-			if [[ ! -f ${componentPath}/_configuration/_volumes/$ileName ]] ; then cp ${componentPath}/_module/_volumes/$fileName ${componentPath}/_configuration/_volumes/$fileName; fi
+			if [[ ! -f ${componentPath}/_configuration/_volumes/$ileName ]] ; then cp ${componentPath}/_module/volumes/$fileName ${componentPath}/_configuration/_volumes/$fileName; fi
 		else
 			folderName="$(basename $f)"
 #      executionplane-info "$folderName"
