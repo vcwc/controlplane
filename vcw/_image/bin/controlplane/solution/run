@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_SOLUTION"
-. executionplane-invoke "$0 $@"
-selectedNode="${@: -1}"
-if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
-
-cd /vcw/pwd/${selectedNode}
-imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
-imageTag=$(git describe --tags HEAD)
-
-method="$1"; shift;
-if [[ "$1" != "-"* && $# -gt 1  ]] ; then component="$1"; shift; fi
-if [[ "$1" != "-"* && $# -gt 1  ]] ; then stack="$1"; shift; fi
-if [[ "$1" == "--recurse" ]] ; then recurse="true"; shift; else recurse="false"; fi
-if [[ "$component" == "" ]] ; then deployScope="controlplane"; component="."; fi
-
-if [[ ! -f _solution/configuration ]] ; then executionplane-error "Solution configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
-if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
-if [[ ! -f ${componentPath}/_configuration/configuration ]] ; then executionplane-error "Solution component configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
+	export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_SOLUTION"
+	. executionplane-invoke "$0 $@"
+	selectedNode="${@: -1}"
+	if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+	cd /vcw/pwd/${selectedNode}
+	imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+	imageTag=$(git describe --tags HEAD)
+
+	method="$1"; shift;
+	if [[ "$1" != "-"* && $# -gt 1  ]] ; then component="$1"; shift; fi
+	if [[ "$1" != "-"* && $# -gt 1  ]] ; then stack="$1"; shift; fi
+	if [[ "$1" == "--recurse" ]] ; then recurse="true"; shift; else recurse="false"; fi
+	if [[ "$component" == "" ]] ; then deployScope="controlplane"; component="."; fi
+
+	if [[ ! -f _solution/configuration ]] ; then executionplane-error "Solution configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+	if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
+	if [[ ! -f ${componentPath}/_configuration/configuration ]] ; then executionplane-error "Solution component configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
 	. set-config
 
 	# if no component and first iteration, then execute repo script
@@ -50,7 +51,7 @@ if [[ ! -f ${componentPath}/_configuration/configuration ]] ; then executionplan
 			;;
 		esac
 	fi
-  executionplane-complete
+
+	cd /vcw/pwd
+	executionplane-complete
 )
-cd /vcw/pwd
-executionplane-complete

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
-. executionplane-invoke "$0 $@"
-selectedNode="${@: -1}"
-if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
-
-cd /vcw/pwd/${selectedNode}
-imageTag=$(git describe --tags HEAD)
-
-if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 (
+	export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_MODULE"
+	. executionplane-invoke "$0 $@"
+	selectedNode="${@: -1}"
+	if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
+	cd /vcw/pwd/${selectedNode}
+	imageTag=$(git describe --tags HEAD)
+
+	if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configuration file does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+
 	. set-config $selectedNode
 	if [[ $# -gt 1 ]] ; then command="$1"; else command="all"; fi
 	case $command in
@@ -43,6 +44,7 @@ if [[ ! -f _module/configuration ]] ; then executionplane-error "Module configur
 			executionplane-error "Method not recognised: $1."
 		;;
 	esac
+
+	cd /vcw/pwd
+	executionplane-complete
 )
-cd /vcw/pwd
-executionplane-complete

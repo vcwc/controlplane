@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_VCW"
-. executionplane-invoke "$0 $@"
-selectedNode="${@: -1}"
-if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
+(
+	export PATH="$VCW_EXECUTIONPLANE_APIINTERNALPATH_VCW"
+	. executionplane-invoke "$0 $@"
+	selectedNode="${@: -1}"
+	if [[ ! -d /vcw/pwd/${selectedNode} ]]; then executionplane-error "${selectedNode}: Does not exist!"; cd /vcw/pwd; executionplane-complete; exit; fi
 
-cd /vcw/pwd/${selectedNode}
-imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
-imageTag=$(git describe --tags HEAD)
+	cd /vcw/pwd/${selectedNode}
+	imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
+	imageTag=$(git describe --tags HEAD)
 
-case $1 in
-	--hub)
-		executionplane "--errors-only" docker image push ${imageName}
-		executionplane "--errors-only" docker image push ${imageName}:${imageTag}
-	;;
-	*)
-		executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}
-		executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}:${imageTag}
-	;;
-esac
-cd /vcw/pwd;
-executionplane-complete
+	case $1 in
+		--hub)
+			executionplane "--errors-only" docker image push ${imageName}
+			executionplane "--errors-only" docker image push ${imageName}:${imageTag}
+		;;
+		*)
+			executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}
+			executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}:${imageTag}
+		;;
+	esac
+	cd /vcw/pwd;
+	executionplane-complete
+)
