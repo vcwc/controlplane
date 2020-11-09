@@ -9,16 +9,31 @@
 	imageName=$(echo $selectedNode | cut -d"/" -f1)/$(echo $selectedNode | cut -d"/" -f2- | tr '/' '.')
 	imageTag=$(git describe --tags HEAD)
 
-	case $1 in
-		--hub)
-			executionplane "--errors-only" docker image push ${imageName}
-			executionplane "--errors-only" docker image push ${imageName}:${imageTag}
-		;;
-		*)
-			executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}
-			executionplane "--errors-only" docker image push ${VCW_REGISTRY}${imageName}:${imageTag}
-		;;
-	esac
+	if [[ $# -gt 1 && "$1" != "--hub" ]] ; then mode="$1"; shift; fi
+	if [[ $# -gt 1 ]] ; then destination="$1"; fi
+	if [[ "$mode" == "-"* ]] ; then
+		if [[ " --external -e --all -a " == *"$mode "* ]] ; then
+			selection=$(find . -name Dockerfile.external)
+		fi
+		if [[ " --internal -i --all -a " == *"$mode "* ]] ; then
+			selection="$selection
+$(find . -name Dockerfile)"
+		fi
+		IFS=$'\n' read -d '' -r -a entries <<< "$selection"
+		for entry in ${entries[@]};
+		do
+			(
+				subNode=$(dirname $entry)
+				subNode="${subNode:1}"
+				entryImageName="${imageName}$(echo $subNode | tr '/' '.')"
+				release-image $entryImageName $imageTag $destination
+			)
+		done
+
+	else
+		release-image $imageName $imageTag $destination
+	fi
+
 	cd /vcw/pwd;
 	executionplane-complete
 )
