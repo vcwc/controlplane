@@ -31,19 +31,45 @@
         if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VCW_REGISTRY}${repoName} ${repoName}; fi
       fi
   		. executionplane-capture-output docker create ${repoName}
-  		executionplane mkdir -p /vcwc/pwd/${repoName}
-  		executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo. /vcwc/pwd/${repoName}
+  		executionplane mkdir -p /vcw/pwd/${repoName}
+  		executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo /vcw/pwd/${repoName}
+      executionplane chmod -R 777 /vcw/pwd/${repoNode}
   	;;
     load)
       repoName="$2"
       executionplane docker image pull ${VCW_REGISTRY}${repoName}
       if [[ "${VCW_REGISTRY}" != "" ]] ; then executionplane docker tag ${VCW_REGISTRY}${repoName} ${repoName}; fi
     ;;
+    load-external)
+      IFS=$'\n' read -d '' -r -a images < /vcw/assets/external-images
+      for image in ${images[@]};
+      do
+        executionplane docker image pull ${image}
+      done
+    ;;
+    release-external)
+      IFS=$'\n' read -d '' -r -a images < /vcw/assets/external-images
+      for image in ${images[@]};
+      do
+        executionplane docker tag ${image} ${VCW_REGISTRY}${image}
+        executionplane docker image push ${VCW_REGISTRY}${image}
+      done
+    ;;
     reset)
       echo "" > ${VCW_CURRENT_CONSOLE_SELECTION}
     ;;
     set)
       echo "$2" > "${VCW_CURRENT_CONSOLE_SELECTION}"
+      repoNode=$(echo $2 | cut -d"/" -f1)/$(echo $2 | cut -d"/" -f2)
+      if [[ ! -d ./$repoNode ]] ; then
+        executionplane-info "$repoNode: Repo does not exist.";
+        executionplane docker pull $repoNode;
+        executionplane docker tag ${VCW_REGISTRY}${repoNode} ${repoNode};
+        . executionplane-capture-output docker create ${repoNode}
+    		executionplane mkdir -p /vcw/pwd/${repoNode}
+    		executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo/. /vcw/pwd/${repoNode}/
+        executionplane chmod -R 777 /vcw/pwd/${repoNode}
+      fi
     ;;
     set-repo-user)
   		executionplane git config --global user.name "$2"
