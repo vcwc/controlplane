@@ -4,7 +4,7 @@ solution=$(echo "$1" | tr '/' '_')
 if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
 DOLLAR='$'
-if [[ -f ${componentPath}/_component/configuration ]] ; then . ${componentPath}/_component/configuration; else . ${componentPath}/_configuration/configuration;  fi
+. ${componentPath}/_configuration/configuration;
 if [[ "$component" != "." ]] ; then
   if [[ "$VCW_SOLUTON_HIDE_COMPONENT" == "true" ]] ; then
     suffix="$(dirname "/$component" | tr '/' '_')"
@@ -29,4 +29,4 @@ else
 fi
 
 . _solution/configuration
-if [[ -f ${componentPath}/_component/configuration ]] ; then . ${componentPath}/_component/configuration; else . ${componentPath}/_configuration/configuration;  fi
+. ${componentPath}/_configuration/configuration;

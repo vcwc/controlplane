@@ -3,20 +3,14 @@ selectedNode="$1"
 component=$2
 if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPath="_solution/${component}"; fi
 
-cp ${componentPath}/_configuration/module.configuration ${componentPath}/_component/configuration
-cat ${componentPath}/_configuration/configuration >> ${componentPath}/_component/configuration
-cp ${componentPath}/_configuration/stacks ${componentPath}/_component/stacks
-cp ${componentPath}/_configuration/volumes ${componentPath}/_component/volumes
-cp ${componentPath}/_configuration/volumes-initialised ${componentPath}/_component/volumes-initialised
-
 . set-config $selectedNode
 
 DOLLAR='$'
-echo $'#!/usr/bin/env bash\n' > ${componentPath}/_component/deploy-local-down
-echo $'#!/usr/bin/env bash\n' > ${componentPath}/_component/deploy-local-up
+echo $'#!/usr/bin/env bash\n' > ${componentPath}/_configuration/deploy-local-down
+echo $'#!/usr/bin/env bash\n' > ${componentPath}/_configuration/deploy-local-up
 
-echo "executionplane --silent docker container prune --force" >> ${componentPath}/_component/deploy-local-down
-IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_component/volumes
+echo "executionplane --silent docker container prune --force" >> ${componentPath}/_configuration/deploy-local-down
+IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_configuration/module-volumes
 for volume in ${volumes[@]};
 do
 	echo "continue=\"true\"
@@ -30,48 +24,38 @@ do
 		sleep 3;
 	fi
 done;
-	" >> ${componentPath}/_component/deploy-local-down
+	" >> ${componentPath}/_configuration/deploy-local-down
 
 echo "executionplane --silent docker volume create ${VCW_STACK_MODULEPREFIX}__${volume}
-	" >> ${componentPath}/_component/deploy-local-up
+	" >> ${componentPath}/_configuration/deploy-local-up
 done;
 
-IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_component/volumes-initialised
+IFS=$'\n' read -d '' -r -a volumes < ${componentPath}/_configuration/module-volumes-initialised
 for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
 	volumeDir=$(echo $volumeSettings | cut -d':' -f 2)
-	if [[ -d "${componentPath}/_component/_volumes/${volumeName}" ]] ; then
+	if [[ -d "${componentPath}/_configuration/volumes/${volumeName}" ]] ; then
 		echo "
-executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_solution/_component/_volumes/${volumeName}/* ${volumeDir}
-" >> ${componentPath}/_component/deploy-local-up
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console cmd cp -r /source/${selectedNode}/_solution/_configuration/volumes/${volumeName}/* ${volumeDir}
+" >> ${componentPath}/_configuration/deploy-local-up
 	else
 		echo "
-executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console untar /source/${selectedNode}/_solution/_component/_volumes/${volumeName}.tar
-" >> ${componentPath}/_component/deploy-local-up
+executionplane --silent docker run -v vcw_controlplane_repos:/source -v ${VCW_STACK_MODULEPREFIX}__${volumeName}:${volumeDir} ${DOLLAR}{VCW_REGISTRY}vcwc/controlplane.vcw console untar /source/${selectedNode}/_solution/_configuration/volumes/${volumeName}.tar
+" >> ${componentPath}/_configuration/deploy-local-up
 	fi
 done;
 
-chmod -R 777 $componentPath/_component/deploy-local*
+chmod -R 777 $componentPath/_configuration/deploy-local*
 
-if [[ -d ${componentPath}/_configuration/_volumes ]] ; then
-  rm -rf ${componentPath}/_component/_volumes/*
-  for f in ${componentPath}/_configuration/_volumes/*
-	do
-    itemName="$(basename $f)"
-    if [[ -d ${componentPath}/_configuration/_volumes/$itemName ]] ; then cp -r ${componentPath}/_configuration/_volumes/$itemName ${componentPath}/_component/_volumes;
-    else cp -r ${componentPath}/_configuration/_volumes/$itemName ${componentPath}/_component/_volumes/$itemName; fi
-  done;
-fi
-
-IFS=$'\n' read -d '' -r -a volumes < $componentPath/_component/volumes-initialised
+IFS=$'\n' read -d '' -r -a volumes < $componentPath/_configuration/module-volumes-initialised
 for volumeSettings in ${volumes[@]};
 do
 	volumeName=$(echo $volumeSettings | cut -d':' -f 1)
-	if [[ -d _configuration/_configs/$volumeName ]] ; then
-		for f in $(find _configuration/_configs/$volumeName ); do
-			if [[ -f $f ]] ; then cat $f | envsubst > ${f//_configuration\/_configs/_component\/_volumes};
-			elif [[ ! -d ${f//_configuration\/_configs/_component\/_volumes} ]] ; then mkdir ${f//_configs/_component/_component\/_volumes}; fi
+	if [[ -d _configuration/configs/$volumeName ]] ; then
+		for f in $(find _configuration/configs/$volumeName ); do
+			if [[ -f $f ]] ; then cat $f | envsubst > ${f//configs/volumes};
+			elif [[ ! -d ${f//configs/volumes} ]] ; then mkdir ${f//configs/volumes}; fi
 		done
 	fi
 done;

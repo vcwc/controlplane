@@ -27,8 +27,8 @@ else
 
 fi
 
-cat ${componentPath}/_component/deploy-local-down >> _solution/_controlplane/remove-volumes
-cat ${componentPath}/_component/deploy-local-up >> _solution/_controlplane/deploy-volumes
+cat ${componentPath}/_configuration/deploy-local-down >> _solution/_controlplane/remove-volumes
+cat ${componentPath}/_configuration/deploy-local-up >> _solution/_controlplane/deploy-volumes
 
 for folder in ${componentPath}/*
 do

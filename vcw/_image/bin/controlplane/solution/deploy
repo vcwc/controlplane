@@ -43,16 +43,14 @@
 				 component-child-axis $selectedNode $component deploy $method
 			;;
 			local-down|local-downup|local-up)
-				if [[ "$method" == *"down"* ]] ; then if [[ "$deployScope" == "controlplane" ]] ; then . ${componentPath}/_controlplane/remove-volumes; else . ${componentPath}/_component/deploy-local-down; fi; fi
-				if [[ "$method" == *"up"* ]] ; then if [[ "$deployScope" == "controlplane" ]] ; then . ${componentPath}/_controlplane/deploy-volumes;	else . ${componentPath}/_component/deploy-local-up; fi; fi
+				if [[ "$method" == *"down"* ]] ; then if [[ "$deployScope" == "controlplane" ]] ; then . ${componentPath}/_controlplane/remove-volumes; else . ${componentPath}/_configuration/deploy-local-down; fi; fi
+				if [[ "$method" == *"up"* ]] ; then if [[ "$deployScope" == "controlplane" ]] ; then . ${componentPath}/_controlplane/deploy-volumes;	else . ${componentPath}/_configuration/deploy-local-up; fi; fi
 			;;
 			*)
 				executionplane-error "invalid API method: $method"
 			;;
 		esac
 	fi
-	executionplane-complete
-
 	cd /vcw/pwd
 	executionplane-complete
 

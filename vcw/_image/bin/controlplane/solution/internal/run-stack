@@ -8,7 +8,7 @@ if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPat
 if [[ "$stackSelector" == "." ]] ; then stackSelector=""; fi
 if [[ "$stackSelector" != "" && "$stackSelector" != "_"* ]] ; then stackSelector=",$stackSelector"; fi
 
-cat $componentPath/_component/stacks | grep $action | grep "$stackSelector" | while read -r line ; do
+cat $componentPath/_configuration/module-stacks | grep $action | grep "$stackSelector" | while read -r line ; do
 		IFS=',' read -r -a columns <<< "$line"
 		(
 		stacktype=${columns[0]}
@@ -24,7 +24,7 @@ cat $componentPath/_component/stacks | grep $action | grep "$stackSelector" | wh
 		if [[ " boot start " == *" $action"* ]] ; then
 			export VCW_STACK_GLOBAL_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${package}"
 			tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
-			stackFolder=${componentPath}/_component/$package
+			stackFolder=${componentPath}/_module/packages/$package
 			composeFile=${stackFolder}/_${stack}.docker-compose.yml
 			. $stackFolder/settings.package
 			. $stackFolder/settings
