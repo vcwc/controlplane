@@ -1,0 +1,14 @@
+vcwc/bash
+vcwc/confluent
+vcwc/confluent_ksqdb
+vcwc/controlplane
+vcwc/dotnetcore
+vcwc/elastic
+vcwc/grafana
+vcwc/nginx
+vcwc/poc
+vcwc/registry
+vcwc/streamsets
+vcwc/swarm
+vcwc/tools
+vcwc/traefik
