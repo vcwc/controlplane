@@ -1,6 +1,6 @@
 vcwc/bash
 vcwc/confluent
-vcwc/confluent_ksqdb
+vcwc/confluent_ksqldb
 vcwc/controlplane
 vcwc/dotnetcore
 vcwc/elastic

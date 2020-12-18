@@ -63,7 +63,7 @@
       if [[ ! -d ./${repoNode} && "${3}" == "--extract" ]] ; then
         executionplane-info "${repoNode}: Repo does not exist.";
         executionplane docker pull ${VCW_REGISTRY}${repoNode};
-        . executionplane-capture-output docker create ${repoNode}
+        . executionplane-capture-output docker create ${VCW_REGISTRY}${repoNode}
     		executionplane mkdir -p /vcw/pwd/${repoNode}
     		executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/. /vcw/pwd/${repoNode}/
         executionplane chmod -R 777 /vcw/pwd/${repoNode}
