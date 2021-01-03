@@ -37,6 +37,6 @@ if [[ " boot start " == *" $action"* ]] ; then
 	rm $tmpfile
 )
 elif [[ " shutdown stop " == *" $action"* ]] ; then
-	executionplane docker stack rm "${VCW_STACK_MODULEPREFIX}__$stack"
+	executionplane docker stack rm "$stackName"
 fi
 done
