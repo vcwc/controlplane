@@ -8,11 +8,3 @@ vcwc/confluent.kafka_connect
 vcwc/confluent.kafka_connect:6.0.0
 vcwc/bash.base
 vcwc/bash.base:5.0.18
-vcwc/elastic.journalbeat
-vcwc/elastic.journalbeat:7.9.2
-vcwc/elastic.metricbeat
-vcwc/elastic.metricbeat:7.9.2
-vcwc/elastic.heartbeat
-vcwc/elastic.heartbeat:7.9.2
-vcwc/elastic.filebeat
-vcwc/elastic.filebeat:7.9.2
