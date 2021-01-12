@@ -14,12 +14,13 @@ cat $componentPath/_configuration/module-stacks | grep $action | grep "$stackSel
 		stacktype=${columns[0]}
 		package=${columns[1]}
 		stack=${columns[2]}
-		export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
 		stackName="${VCW_STACK_MODULEPREFIX}__$stack"
+		export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX}__$package"
+		export VCW_STACK_GLOBAL_STACKPREFIX_CAPPED="${VCW_STACK_GLOBAL_STACKPREFIX}"
 		if (( ${#stackName} > 45 )) ; then
 			let "finish = ${#VCW_STACK_MODULEPREFIX} + 45 - ${#stackName}";
 			stackName="${VCW_STACK_MODULEPREFIX:0:finish}__X_${stack}";
-			export VCW_STACK_GLOBAL_STACKPREFIX="${VCW_STACK_MODULEPREFIX:0:finish}__X_$package";
+			export VCW_STACK_GLOBAL_STACKPREFIX_CAPPED="${VCW_STACK_MODULEPREFIX:0:finish}__X_$package";
 		fi;
 		if [[ " boot start " == *" $action"* ]] ; then
 			export VCW_STACK_GLOBAL_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/${package}"

@@ -6,12 +6,6 @@ if [[ -f _module/module-stacks.module ]] ; then rm _module/module-stacks.module;
 if [[ -f _module/module-volumes ]] ; then rm _module/module-volumes; fi
 if [[ -f _module/module-volumes-initialised ]]; then rm _module/module-volumes-initialised; fi
 
-configurationBlock=$(sed -n "/# START CONFIGURATION/,/# END CONFIGURATION/p" _module/configuration)
-echo $'#!/usr/bin/env bash\n' > _module/configuration
-echo "${configurationBlock}
-
-# START OTHER SETTINGS" >> _module/configuration
-
 for packageFolder in _module/packages/*
 do
 
@@ -20,8 +14,6 @@ do
 	export VCW_STACK_GLOBAL_URLPREFIX="${VCW_STACK_MODULE_URLPREFIX}/$package"
 	(
 		. _module/packages/${package}/settings
-
-		grep _MODULE_ _module/packages/${package}/settings >> _module/configuration
 
 		IFS=',' read -r -a stacks <<< "${VCW_STACK_GLOBAL_BOOTSTACKS}"
 		for stack in ${stacks[@]}; do echo "boot/shutdown,$package,$stack" >> _module/module-stacks.module; done
@@ -37,9 +29,6 @@ do
 	)
 
 done;
-
-echo "# END OTHER SETTINGS
-" >> _module/configuration
 
 touch _module/module-stacks.module
 touch _module/module-volumes
