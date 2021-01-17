@@ -21,7 +21,10 @@ fi
 export PS1="${hostname}:${VCW_FLAVOR}#$ "
 
 export VCW_CURRENT_CONSOLE_SELECTION="/vcw/pwd/console-selection-${VCW_EXECUTIONTAG}"
-echo "" > "${VCW_CURRENT_CONSOLE_SELECTION}"
+if [[ ! -f "${VCW_CURRENT_CONSOLE_SELECTION}" ]] ; then
+	echo "" > "${VCW_CURRENT_CONSOLE_SELECTION}"
+	export VCW_CURRENT_CONSOLE_SELECTION_DELETE="true"
+fi;
 
 if [[ "$@" == *"@"* ]] ; then
 	echo "$@" | tr "@" "\n" > commands.sh
@@ -29,4 +32,4 @@ if [[ "$@" == *"@"* ]] ; then
 	rm commands.sh
 else bash $@; fi
 
-rm "${VCW_CURRENT_CONSOLE_SELECTION}"
+if [[ "$VCW_CURRENT_CONSOLE_SELECTION_DELETE" == "true" ]] ; then rm "${VCW_CURRENT_CONSOLE_SELECTION}" fi;

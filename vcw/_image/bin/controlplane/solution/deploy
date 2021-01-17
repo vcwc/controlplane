@@ -28,14 +28,14 @@
 		case $method in
 			down|downup|up)
 				if [[ "$method" == *"down"* ]] ; then
-					deploy local-down $component $selectedNode
-#					controlplane-service deploy solution local-down $component $selectedNode
+#					deploy local-down $component $selectedNode
+					controlplane-service deploy solution local-down $component $selectedNode
 					if [[ "$component" == "." ]] ; then deploy networks-down $selectedNode; fi
 				fi
 				if [[ "$method" == *"up"* ]] ; then
 					if [[ "$component" == "." ]] ; then deploy networks-up $selectedNode; fi
-#					controlplane-service deploy solution local-up $component $selectedNode
-					deploy local-up $component $selectedNode
+					controlplane-service deploy solution local-up $component $selectedNode
+#					deploy local-up $component $selectedNode
 				fi
 			;;
 			networks-up|networks-down)
