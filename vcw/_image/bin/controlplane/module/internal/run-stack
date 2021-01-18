@@ -34,7 +34,7 @@ if [[ " boot start " == *" $action"* ]] ; then
 	tmpfile=$(mktemp /tmp/docker-compose.yml.XXXXXX)
 	cat _module/packages/$package/_$stack.docker-compose.yml | envsubst > $tmpfile
 	cat $tmpfile
-	executionplane  docker stack deploy -c $tmpfile "$stackName"
+	executionplane  docker stack deploy --with-registry-auth -c $tmpfile "$stackName"
 	rm $tmpfile
 )
 elif [[ " shutdown stop " == *" $action"* ]] ; then

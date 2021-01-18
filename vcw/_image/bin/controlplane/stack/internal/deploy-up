@@ -33,6 +33,6 @@ do
 	arguments="-c $tmpfile $stackName"
 	cat _stack/stacks/${stackName}.docker-compose.yml | envsubst > $tmpfile
 	cat $tmpfile
-	executionplane docker stack deploy $arguments
+	executionplane docker stack deploy --with-registry-auth $arguments
 	rm $tmpfile
 done;

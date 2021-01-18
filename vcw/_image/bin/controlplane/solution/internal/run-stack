@@ -36,7 +36,7 @@ cat $componentPath/_configuration/module-stacks | grep $action | grep "$stackSel
 			fi
 			cat $composeFile | envsubst > $tmpfile
 			cat $tmpfile
-			executionplane  docker stack deploy -c $tmpfile "$stackName"
+			executionplane  docker stack deploy --with-registry-auth -c $tmpfile "$stackName"
 			rm $tmpfile
 		elif [[ " shutdown stop " == *" $action"* ]] ; then
 			executionplane docker stack rm "$stackName"
