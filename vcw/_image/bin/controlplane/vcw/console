@@ -26,6 +26,11 @@
     ;;
     load)
       case $2 in
+        all)
+          console load external;
+          console load hub-external;
+          console load hub;
+        ;;
         external|hub|hub-external)
           IFS=$'\n' read -d '' -r -a images < /vcw/assets/${2}-images
           for image in ${images[@]};
@@ -42,6 +47,11 @@
     ;;
     release)
       case $2 in
+        all)
+          console release external;
+          console release hub-external;
+          console release hub;
+        ;;
         external|hub|hub-external)
           IFS=$'\n' read -d '' -r -a images < /vcw/assets/${2}-images
           for image in ${images[@]};
