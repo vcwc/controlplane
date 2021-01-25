@@ -1,10 +1,10 @@
-vcwc/nginx.base
+vcwc/nginx.base:latest
 vcwc/nginx.base:1.19.3
-vcwc/streamsets.base
+vcwc/streamsets.base:latest
 vcwc/streamsets.base:3.18.1
-vcwc/controlplane.base
+vcwc/controlplane.base:latest
 vcwc/controlplane.base:1.0.0
-vcwc/confluent.kafka_connect
+vcwc/confluent.kafka_connect:latest
 vcwc/confluent.kafka_connect:6.0.0
-vcwc/bash.base
+vcwc/bash.base:latest
 vcwc/bash.base:5.0.18

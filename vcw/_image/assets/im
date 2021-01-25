@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+docker volume create --driver local --opt type=none --opt o=bind --opt device=$(pwd) vcw_controlplane_repos > /dev/null
+#docker run -it -v /etc:/hostfs/etc:ro -v /var/run/docker.sock:/var/run/docker.sock -v vcw_controlplane_repos:/vcw/pwd registry.vcweb.iot/vcwc/controlplane.vcw --linux $@ > /dev/null
+docker run -it -v /etc:/hostfs/etc:ro -v /var/run/docker.sock:/var/run/docker.sock -v vcw_controlplane_repos:/vcw/pwd registry.vcweb.iot/vcwc/controlplane.vcw --container $@ > /dev/null
+#docker volume rm vcw_controlplane_repos
