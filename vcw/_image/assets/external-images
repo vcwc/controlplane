@@ -19,6 +19,9 @@ kibana:7.9.2
 mcr.microsoft.com/dotnetcore.runtime:3.1
 nginx:1.19.3
 registry:2
+streamsets/datacollector-libs:streamsets-datacollector-elasticsearch_5-lib-3.16.0
+streamsets/datacollector-libs:streamsets-datacollector-apache-kafka_2_0-lib-3.16.0
+streamsets/datacollector:3.16.0
 streamsets/datacollector-libs:streamsets-datacollector-elasticsearch_5-lib-3.18.1
 streamsets/datacollector-libs:streamsets-datacollector-apache-kafka_2_0-lib-3.18.1
 streamsets/datacollector:3.18.1
