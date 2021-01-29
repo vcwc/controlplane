@@ -36,6 +36,7 @@
 		;;
 		extract)
 			. executionplane-capture-output docker create ${imageName}
+			executionplane rm -rf $selectedNode
 			executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo/. .
 		;;
 		load)
