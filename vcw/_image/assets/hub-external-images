@@ -1,6 +1,7 @@
 vcwc/nginx.base:latest
 vcwc/nginx.base:1.19.3
 vcwc/streamsets.base:latest
+vcwc/streamsets.base:3.16.0
 vcwc/streamsets.base:3.18.1
 vcwc/controlplane.base:latest
 vcwc/controlplane.base:1.0.0

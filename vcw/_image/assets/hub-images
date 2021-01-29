@@ -41,6 +41,7 @@ vcwc/poc:1.0.0
 vcwc/registry:latest
 vcwc/registry:2
 vcwc/streamsets:latest
+vcwc/streamsets:3.16.0
 vcwc/streamsets:3.18.1
 vcwc/swarm:latest
 vcwc/swarm:1.0.0
