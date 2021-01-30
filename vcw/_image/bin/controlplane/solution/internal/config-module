@@ -6,8 +6,8 @@ if [[ "$component" == "." ]] ; then componentPath="_solution"; else componentPat
 
 . ${componentPath}/_configuration/configuration
 
-if [[ -d ${componentPath}/_module ]] ; then rm -rf ${componentPath}/_module; fi
-if [[ ! -d ${componentPath}/_configuration ]] ; then mkdir ${componentPath}/_configuration; fi
+if [[ -d ${componentPath}/_module ]] ; then rm -rf ${componentPath}/_module;
+else replaceConfiguration="true"; fi
 
 moduleImage=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f1-2);
 moduleSubNode=$(echo ${VCW_SOLUTON_COMPONENT_MODULE} | cut -d'/' -f3-);
@@ -18,8 +18,9 @@ executionplane docker container cp ${VCW_EXECUTIONPLANE_OUTPUT}:/vcw/repo/${modu
 
 configurationHeader=$'#!/usr/bin/env bash\n\n'
 configurationBlock=$(sed -n "/# START COMPONENT CONFIGURATION/,/# END COMPONENT CONFIGURATION/p" ${componentPath}/_configuration/configuration)
-echo "$configurationHeader $configurationBlock" > ${componentPath}/_configuration/configuration
-cat ${componentPath}/_module/configuration >> ${componentPath}/_configuration/configuration
+echo "$configurationHeader $configurationBlock" > ${componentPath}/_configuration/configuration.component
+cat ${componentPath}/_module/configuration >> ${componentPath}/_configuration/configuration.component
+if [[ "$replaceConfiguration" == "true" ]] ; then cat ${componentPath}/_configuration/configuration.component > ${componentPath}/_configuration/configuration; fi
 
 if [[ ! -f ${componentPath}/_configuration/module-stacks ]] ; then cp ${componentPath}/_module/module-stacks ${componentPath}/_configuration/module-stacks; fi
 if [[ ! -f ${componentPath}/_configuration/module-volumes ]] ; then cp ${componentPath}/_module/module-volumes ${componentPath}/_configuration/module-volumes; fi
