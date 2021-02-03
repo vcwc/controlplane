@@ -64,6 +64,13 @@
         ;;
       esac
     ;;
+    reload-controlplane)
+      if [[ "$2" != "--local" && "$(docker node ls -q | wc -l)" != "1" ]] ; then
+        controlplane-service console reload-controlplane --local $selectedNode
+      else
+        executionplane docker image pull ${VCW_REGISTRY}vcwc/controlplane.vcw
+      fi
+    ;;
     reset)
       echo "" > ${VCW_CURRENT_CONSOLE_SELECTION}
     ;;
