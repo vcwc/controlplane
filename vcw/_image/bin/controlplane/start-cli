@@ -18,7 +18,7 @@ hostname="${VCW_HOSTNAME}"
 if [[ "$hostname" == "host.docker.internal" ]] ; then
 	hostname="linuxkit"
 fi
-export PS1="${hostname}:${VCW_FLAVOR}#$ "
+export PS1="${hostname}$ "
 
 export VCW_CURRENT_CONSOLE_SELECTION="/vcw/pwd/console-selection-${VCW_EXECUTIONTAG}"
 if [[ ! -f "${VCW_CURRENT_CONSOLE_SELECTION}" ]] ; then
