@@ -35,17 +35,25 @@
 			executionplane git remote add origin test
 		;;
 		extract)
-			. executionplane-capture-output docker create ${imageName}
-			executionplane rm -rf $selectedNode
-			executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo/. .
+			if [[ "$2" != "--local" && "$(docker node ls -q | wc -l)" != "1" ]] ; then
+				controlplane-service repo extract --local $selectedNode
+			else
+				. executionplane-capture-output docker create ${imageName}
+				executionplane rm -rf $selectedNode
+				executionplane docker container cp $VCW_EXECUTIONPLANE_OUTPUT:/vcw/repo/. .
+			fi
 		;;
 		load)
-		  if [[ "$2" == "--hub" ]] ; then executionplane docker image pull ${imageName}:${imageTag};
-		else executionplane docker image pull ${VCW_REGISTRY}${imageName}:${imageTag}; fi;
-			executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${VCW_REGISTRY}${imageName};
-			if [[ "${VCW_REGISTRY}" != "" ]] ; then
-				executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName};
-				executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
+			if [[ "$2" != "--local" && "$(docker node ls -q | wc -l)" != "1" ]] ; then
+				controlplane-service repo load --local $selectedNode
+			else
+			  if [[ "$2" == "--hub" ]] ; then executionplane docker image pull ${imageName}:${imageTag};
+				else executionplane docker image pull ${VCW_REGISTRY}${imageName}:${imageTag}; fi;
+				executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${VCW_REGISTRY}${imageName};
+				if [[ "${VCW_REGISTRY}" != "" ]] ; then
+					executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName};
+					executionplane docker tag ${VCW_REGISTRY}${imageName}:${imageTag} ${imageName}:${imageTag};
+				fi
 			fi
 		;;
 		log)
@@ -56,8 +64,12 @@
 			executionplane "--errors-only" git push -f origin $imageTag
 		;;
 		remove)
-			cd /vcw/pwd
-			executionplane rm -rf $selectedNode
+			if [[ "$2" != "--local" && "$(docker node ls -q | wc -l)" != "1" ]] ; then
+				controlplane-service remove load --local $selectedNode
+			else
+				cd /vcw/pwd
+				executionplane rm -rf $selectedNode
+			fi
 		;;
 		reset)
 			executionplane rm -rf .git
