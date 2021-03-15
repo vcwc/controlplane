@@ -12,6 +12,7 @@ vcwc/confluent.kafka_connect.rest:latest
 vcwc/confluent.kafka_connect.rest:6.0.0
 vcwc/confluent_ksqldb:latest
 vcwc/confluent_ksqldb:0.12.0
+vcwc/confluent_ksqldb:0.15.0
 vcwc/controlplane:latest
 vcwc/controlplane:1.0.0
 vcwc/controlplane.cli:latest
