@@ -8,8 +8,10 @@ vcwc/bash.wrapper:latest
 vcwc/bash.wrapper:5.0.18
 vcwc/confluent:latest
 vcwc/confluent:6.0.0
+vcwc/confluent:6.0.2
 vcwc/confluent.kafka_connect.rest:latest
 vcwc/confluent.kafka_connect.rest:6.0.0
+vcwc/confluent.kafka_connect.rest:6.0.2
 vcwc/confluent_ksqldb:latest
 vcwc/confluent_ksqldb:0.12.0
 vcwc/confluent_ksqldb:0.15.0
